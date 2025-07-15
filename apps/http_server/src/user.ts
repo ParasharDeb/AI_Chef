@@ -1,8 +1,9 @@
-import express, { Router } from "express"
+import express, {  Response, Router ,Request} from "express"
 import { SignupSchema,SigninSchema } from "./types";
 import { prismaclient } from "@repo/db/client";
 import jwt from "jsonwebtoken"
-import { JWT_SECRET } from "../../../packages/backend_common/src";
+import { JWT_SECRET } from "@repo/backend-common/config";
+import { middleware } from "./middleware";
 const userrouter:Router=express.Router();
 userrouter.post("/signup", async (req, res) => {
   const parseddata = SignupSchema.safeParse(req.body);
@@ -52,7 +53,28 @@ userrouter.post("/signin", async (req, res) => {
   );
   res.json({ token:token });
 });
-userrouter.get("/profile",(req,res)=>{
-  
+interface Authrequest extends Request{
+  userId?:string
+}
+userrouter.get("/profile",middleware,async(req:Authrequest,res:Response)=>{
+  const userId= req.userId 
+  if(!userId){
+    res.json({
+      message:"Unauthorized"
+    })
+  }
+  const user = await prismaclient.user.findUnique({
+    where:{
+      id:userId
+    }
+  })
+  if(!user){
+    res.json({
+      message:"user not found"
+    })
+  }
+  res.json({
+    user
+  })
 })
 export default userrouter
