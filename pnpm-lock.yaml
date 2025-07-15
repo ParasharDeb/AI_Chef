@@ -57,6 +57,9 @@ importers:
 
   apps/http_server:
     dependencies:
+      '@repo/backend-common':
+        specifier: workspace:*
+        version: link:../../packages/backend_common
       '@repo/db':
         specifier: workspace:*
         version: link:../../packages/db
@@ -118,6 +121,16 @@ importers:
       typescript:
         specifier: 5.8.2
         version: 5.8.2
+
+  packages/backend_common:
+    dependencies:
+      '@types/node':
+        specifier: ^22.15.3
+        version: 22.15.3
+    devDependencies:
+      '@repo/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
 
   packages/db:
     dependencies:
