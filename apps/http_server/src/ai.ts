@@ -24,25 +24,24 @@ airouter.get("/recipe",async(req,res)=>{
   res.json({ reply: response.data.choices[0].message.content });
 });
 airouter.get("/chat",async(req,res)=>{
-    const userMessage=req.body.message;
-    const response= await axios.post(
-        "https://api.groq.com/openai/v1/chat/completions",
-    
+  const userMessage = req.body.message;
+  const response = await axios.post(
+    "https://api.groq.com/openai/v1/chat/completions",
     {
-        model: "mixtral-8x7b-32768",
-    
-    messages:[
-        {role :"system",content:"You are a helpful doubt solver for a chef. the user will come and ask you questions about their cooking and you have to give them answers based on their problems"},
-        {role :"user",content:userMessage}
-    ],
+      model: "llama3-8b-8192",
+      messages: [
+        { role: "system", content: "You are a helpful doubt solver for a chef. the user will come and ask you questions about their cooking and you have to give them answers based on their problems" },
+        { role: "user", content: userMessage },
+      ],
     },
     {
-        headers:{
-            Authorization:`Bearer ${api_key}`,
-            "Content-Type":"application/json",
-        },
+      headers: {
+        Authorization: `Bearer ${api_key}`,
+        "Content-Type": "application/json",
+      },
     }
-);
-})
+  );
 
+  res.json({ reply: response.data.choices[0].message.content });
+})
 export default airouter
