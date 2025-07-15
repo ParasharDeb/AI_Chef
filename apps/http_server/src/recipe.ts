@@ -48,7 +48,38 @@ reciperouter.get("/myrecipes",middleware,async(req:Authrequest,res:Response)=>{
     })
     res.json(recipes)
 })
-reciperouter.get("/filer?recipe",(req,res)=>{
-    
-})
+reciperouter.get("/search", async (req, res) => {
+  const query = req.query.q as string;
+
+  if (!query) {
+    res.status(400).json({ message: "Missing search query" });
+    return;
+  }
+
+  try {
+    const recipes = await prismaclient.recipe.findMany({
+      where: {
+        OR: [
+          {
+            Title: {
+              contains: query,
+              mode: 'insensitive', // case-insensitive search
+            },
+          },
+          {
+            Description: {
+              contains: query,
+              mode: 'insensitive',
+            },
+          },
+        ],
+      },
+    });
+
+    res.json(recipes);
+  } catch (error) {
+    res.status(500).json({ message: "Error searching recipes", error });
+  }
+});
+
 export default reciperouter
