@@ -21,7 +21,7 @@ reciperouter.post("/addrecipe",middleware,async(req:Authrequest,res:Response)=>{
         })
         return 
     }
-    const recipe = await prismaclient.recipe.create({
+    await prismaclient.recipe.create({
         data:{
             Description:parseddata.data?.description,
             Title:parseddata.data.title,
@@ -29,14 +29,26 @@ reciperouter.post("/addrecipe",middleware,async(req:Authrequest,res:Response)=>{
             userId:userId
         }
     })
+    res.json({
+        message:"Recipe added succesfully"
+    })
 })
-reciperouter.get("/allrecipes",(req,res)=>{
-
+reciperouter.get("/allrecipes",middleware,async(req,res)=>{
+    const recipes = await prismaclient.recipe.findMany()
+    res.json(
+        recipes
+    )
 })
-reciperouter.get("/myrecipes",(req,res)=>{
-
+reciperouter.get("/myrecipes",middleware,async(req:Authrequest,res:Response)=>{
+    const userId= req.userId
+    const recipes = await prismaclient.recipe.findMany({
+        where:{
+            userId:userId
+        }
+    })
+    res.json(recipes)
 })
 reciperouter.get("/filer?recipe",(req,res)=>{
-
+    
 })
 export default reciperouter
