@@ -63,7 +63,7 @@ reciperouter.get("/search", async (req, res) => {
           {
             Title: {
               contains: query,
-              mode: 'insensitive', // case-insensitive search
+              mode: 'insensitive', 
             },
           },
           {
