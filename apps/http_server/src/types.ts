@@ -10,3 +10,7 @@ export const SigninSchema =z.object({
     password:z.string()
 })
 
+export const UpdateSchema=z.object({
+    oldpassword:z.string(),
+    newpassword:z.string()
+})

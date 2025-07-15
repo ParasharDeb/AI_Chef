@@ -1,1 +1,1 @@
-{"root":["./src/ai.ts","./src/index.ts","./src/middleware.ts","./src/recipe.ts","./src/user.ts","./src/zod.ts"],"version":"5.8.3"}
+{"root":["./src/ai.ts","./src/index.ts","./src/middleware.ts","./src/recipe.ts","./src/types.ts","./src/user.ts"],"version":"5.8.3"}

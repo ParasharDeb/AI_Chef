@@ -1,5 +1,5 @@
 import express, {  Response, Router ,Request} from "express"
-import { SignupSchema,SigninSchema } from "./types";
+import { SignupSchema,SigninSchema, UpdateSchema } from "./types";
 import { prismaclient } from "@repo/db/client";
 import jwt from "jsonwebtoken"
 import { JWT_SECRET } from "@repo/backend-common/config";
@@ -26,6 +26,9 @@ userrouter.post("/signup", async (req, res) => {
       message: "Email already exists"
     });
   }
+  res.json({
+    message:"you have signed up"
+  })
 });
 userrouter.post("/signin", async (req, res) => {
   const parseddata = SigninSchema.safeParse(req.body);
@@ -75,6 +78,38 @@ userrouter.get("/profile",middleware,async(req:Authrequest,res:Response)=>{
   }
   res.json({
     user
+  })
+})
+userrouter.put("/update",async(req:Authrequest,res:Response)=>{
+  const parseddata=UpdateSchema.safeParse(req.body)
+  const userId=req.userId
+  if(!userId){
+    res.json({
+      message:"you are not authorized"
+    })
+    return
+  }
+  if(!parseddata){
+    res.json({
+      message:"Invalid input"
+    })
+    return
+  }
+  const user = await prismaclient.user.update({
+    where:{
+      id:userId
+    },
+    data:{
+      password:parseddata.data?.newpassword
+    }
+  })
+  if(!user){
+    res.json({
+      message:"incorrect password"
+    })
+  }
+  res.json({
+    message:"Your password has been changed"
   })
 })
 export default userrouter
