@@ -2,6 +2,7 @@ import express, {  Response, Router ,Request} from "express"
 import { SignupSchema,SigninSchema, UpdateSchema } from "./types";
 import { prismaclient } from "@repo/db/client";
 import jwt from "jsonwebtoken"
+import bcrypt from "bcrypt"
 import { JWT_SECRET } from "@repo/backend-common/config";
 import { middleware } from "./middleware";
 const userrouter:Router=express.Router();
@@ -12,13 +13,14 @@ userrouter.post("/signup", async (req, res) => {
       message: "Invalid Input"
     });
   }
-  const { username, email, password } = parseddata.data;
+
+  const hashedpassword = await bcrypt.hash(parseddata.data.password,10)
   try {
     const user = await prismaclient.user.create({
       data: {
-        username,
-        email,
-        password
+        username:parseddata.data?.username,
+        email:parseddata.data.email,
+        password:hashedpassword
       }
     });
   } catch (err) {
@@ -41,7 +43,6 @@ userrouter.post("/signin", async (req, res) => {
   const user = await prismaclient.user.findFirst({
     where: {
       email: parseddata.data.email,
-      password: parseddata.data.password
     }
   });
   if (!user) {
@@ -49,6 +50,12 @@ userrouter.post("/signin", async (req, res) => {
       message: "User not found"
     });
     return;
+  }
+  const checkedpassword= bcrypt.compare(parseddata.data.password,user.password)
+  if(!checkedpassword){
+    res.json({
+      message:"incorrect password"
+    })
   }
   const token = jwt.sign(
     { userId: user.id },
@@ -107,6 +114,7 @@ userrouter.put("/update",async(req:Authrequest,res:Response)=>{
     res.json({
       message:"incorrect password"
     })
+    return
   }
   res.json({
     message:"Your password has been changed"
