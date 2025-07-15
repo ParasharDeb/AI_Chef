@@ -87,37 +87,34 @@ userrouter.get("/profile",middleware,async(req:Authrequest,res:Response)=>{
     user
   })
 })
-userrouter.put("/update",async(req:Authrequest,res:Response)=>{
-  const parseddata=UpdateSchema.safeParse(req.body)
-  const userId=req.userId
-  if(!userId){
-    res.json({
-      message:"you are not authorized"
-    })
-    return
+
+userrouter.put("/update", async (req: Authrequest, res: Response) => {
+  const parseddata = UpdateSchema.safeParse(req.body);
+  const userId = req.userId;
+
+  if (!userId) {
+    res.json({ message: "you are not authorized" });
+    return;
   }
-  if(!parseddata){
-    res.json({
-      message:"Invalid input"
-    })
-    return
+
+  if (!parseddata.success) {
+    res.json({ message: "Invalid input" });
+    return;
   }
+
+  const hashedPassword = await bcrypt.hash(parseddata.data.newpassword, 10);
+
   const user = await prismaclient.user.update({
-    where:{
-      id:userId
-    },
-    data:{
-      password:parseddata.data?.newpassword
-    }
-  })
-  if(!user){
-    res.json({
-      message:"incorrect password"
-    })
-    return
+    where: { id: userId },
+    data: { password: hashedPassword },
+  });
+
+  if (!user) {
+    res.json({ message: "incorrect password" });
+    return;
   }
-  res.json({
-    message:"Your password has been changed"
-  })
-})
+
+  res.json({ message: "Your password has been changed" });
+});
+
 export default userrouter
