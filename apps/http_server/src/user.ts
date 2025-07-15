@@ -52,4 +52,7 @@ userrouter.post("/signin", async (req, res) => {
   );
   res.json({ token:token });
 });
+userrouter.get("/profile",(req,res)=>{
+  
+})
 export default userrouter
