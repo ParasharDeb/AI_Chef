@@ -11,7 +11,7 @@ export default function Mainbody(){
         <div className=' py-10 grid grid-cols-5 gap-4'>
                 <div className='rounded-md ml-25 col-span-3 h-100 w-100'><img src="/spoons-2.png"/></div>
                 <div className=" rounded-full h-100 w-100 col-span-2" ref={boxref}>
-                    <img  className="rounded-full" src="/chicken_breast.png" alt="" />
+                    <img  src="/momos-removebg-preview.png" alt="" />
                 </div>
 
         </div>
