@@ -1,0 +1,19 @@
+'use client'
+import gsap from 'gsap'
+import { useGSAP } from '@gsap/react'
+import { useRef } from 'react'
+export default function Mainbody(){
+    useGSAP(()=>{
+        gsap.to(boxref.current,{duration:1.5,rotate:180})
+    },[])
+    const boxref=useRef(null)
+    return(
+        <div className=' py-10 grid grid-cols-5 gap-4'>
+                <div className='rounded-md ml-25 bg-yellow-300 col-span-3 h-100 w-100'></div>
+                <div className=" rounded-full h-100 w-100 col-span-2" ref={boxref}>
+                    <img  className="rounded-full" src="/chicken_breast.png" alt="" />
+                </div>
+                
+        </div>
+    )
+}
