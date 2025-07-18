@@ -9,11 +9,11 @@ export default function Mainbody(){
     const boxref=useRef(null)
     return(
         <div className=' py-10 grid grid-cols-5 gap-4'>
-                <div className='rounded-md ml-25 bg-yellow-300 col-span-3 h-100 w-100'></div>
+                <div className='rounded-md ml-25 col-span-3 h-100 w-100'><img src="/spoons-2.png"/></div>
                 <div className=" rounded-full h-100 w-100 col-span-2" ref={boxref}>
                     <img  className="rounded-full" src="/chicken_breast.png" alt="" />
                 </div>
-                
+
         </div>
     )
 }
