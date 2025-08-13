@@ -1,135 +1,124 @@
-# Turborepo starter
+# 🍳 AI Chef – Your Personal AI Cooking Assistant
 
-This Turborepo starter is maintained by the Turborepo core team.
+![AI Chef Banner](https://via.placeholder.com/1200x400.png?text=AI+Chef+-+Your+Personal+Cooking+Companion)
 
-## Using this example
+> **AI Chef** is your smart kitchen companion where you can:
+> - Ask for **different recipes**
+> - Save & access **personalized recipes**
+> - Get suggestions based on **ingredients you already have at home**
+> - *(Work in progress)* Suggest recipes depending on your **mood** 🎭
 
-Run the following command:
+---
 
-```sh
-npx create-turbo@latest
-```
+## ✨ Features
 
-## What's inside?
+- **🧠 AI-Powered Recipe Suggestions** – Just tell the AI what you want, and it’ll provide step-by-step recipes.
+- **💾 Personalized Recipe Book** – Save your own favorite recipes for quick access.
+- **🏠 Ingredient-Based Recommendations** – Tell AI Chef what's in your fridge and get cooking ideas instantly.
+- **🎭 Mood-Based Dishes** – (Coming soon) Suggest meals depending on your mood & preferences.
+- **⚡ Modern Tech Stack** – Built to be scalable, fast, and user-friendly.
 
-This Turborepo includes the following packages/apps:
+---
 
-### Apps and Packages
+## 🛠 Tech Stack
 
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
+| Technology        | Usage                              |
+|-------------------|------------------------------------|
+| **TypeScript**    | Strongly typed JavaScript          |
+| **Node.js**       | Backend runtime environment        |
+| **Express.js**    | API server                         |
+| **Prisma**        | Database ORM                       |
+| **Next.js**       | Full-stack React framework         |
+| **React**         | Frontend UI library                |
+| **Tailwind CSS**  | Styling                            |
+| **Turborepo**     | Monorepo management                |
 
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
+---
 
-### Utilities
+## 📂 Folder Structure
 
-This Turborepo has some additional tools already setup for you:
+ai-chef/
+│
+├── apps/
+│ ├── ai_chef(frontend)/ # Next.js + React + Tailwind frontend
+│ ├── http_server/ # Express + Prisma backend
+│
+├── packages/
+│ ├── config/ # Shared configurations
+│ ├── ui/ # Shared UI components
+│
+├── prisma/
+│ └── schema.prisma # Database schema
+│
+├── turbo.json # Turborepo config
+├── package.json
+└── README.md
 
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
+---
 
-### Build
+## 🚀 Installation & Setup
 
-To build all apps and packages, run the following command:
+Clone the repository
+git clone https://github.com/ParasharDeb/AI_Chef
 
-```
-cd my-turborepo
+Navigate into the project
+cd ai-chef
 
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build
+Install dependencies
+pnpm install
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build
-yarn dlx turbo build
-pnpm exec turbo build
-```
+Setup environment variables
+.env
 
-You can build a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
+Fill in database URL and API keys in .env
+Migrate database
+npx prisma migrate dev
 
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build --filter=docs
+Run development server (Turborepo will start web & api)
+pnpm run dev
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build --filter=docs
-yarn exec turbo build --filter=docs
-pnpm exec turbo build --filter=docs
-```
 
-### Develop
+---
 
-To develop all apps and packages, run the following command:
+## 📌 Environment Variables
 
-```
-cd my-turborepo
+In your `.env` file:
+DATABASE_URL="postgresql://user:password@localhost:5432/ai-chef"
+OPENAI_API_KEY="your-openai-api-key"
+JWT_SECRET="jwt_secret"
 
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev
+---
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev
-yarn exec turbo dev
-pnpm exec turbo dev
-```
+## 🧪 Usage
 
-You can develop a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
+- **Frontend**: Visit `http://localhost:3000` for the web app.
+- **Backend**: API runs at `http://localhost:4000` (if separate).
+- Ask AI Chef for recipes, upload your custom ones, and let it surprise you!
 
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev --filter=web
+---
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev --filter=web
-yarn exec turbo dev --filter=web
-pnpm exec turbo dev --filter=web
-```
+## 🗺 Roadmap
 
-### Remote Caching
+- [x] AI-powered recipe search
+- [x] Personalized recipe saving
+- [x] Ingredient-based suggestions
+- [ ] Mood-based recipe generation 🎭
+- [ ] User authentication for recipe book sync
+- [ ] Integration with grocery delivery APIs
 
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
+---
 
-Turborepo can use a technique known as [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
+## 📸 Screenshots (optional)
 
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
+| Homepage | Recipe Suggestion |
+|----------|--------------------|
+| ![Home](https://via.placeholder.com/400x250.png?text=Home+Screen) | ![Recipe](https://via.placeholder.com/400x250.png?text=Recipe+View) |
 
-```
-cd my-turborepo
+---
 
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo login
+## 🤝 Contributing
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo login
-yarn exec turbo login
-pnpm exec turbo login
-```
+Contributions welcome! Please fork the repo and submit a pull request.
+There are multiple Issues. Feel free to resolve them 
+---
 
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
-
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
-
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo link
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo link
-yarn exec turbo link
-pnpm exec turbo link
-```
-
-## Useful Links
-
-Learn more about the power of Turborepo:
-
-- [Tasks](https://turborepo.com/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.com/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.com/docs/reference/configuration)
-- [CLI Usage](https://turborepo.com/docs/reference/command-line-reference)
