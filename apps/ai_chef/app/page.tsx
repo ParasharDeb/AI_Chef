@@ -8,6 +8,7 @@ export default function Home() {
     <div><Navbara/></div>
     <div><Mainbody/></div>
     <div><Menu/></div>
+    <div className="w-screen h-screen"></div>
     </div>
   );
 }

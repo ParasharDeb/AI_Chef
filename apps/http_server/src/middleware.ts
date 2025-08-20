@@ -6,6 +6,10 @@ interface AuthenticatedRequest extends Request {
 }
 export function middleware(req:AuthenticatedRequest,res:Response,next:NextFunction){
     const token=req.headers["authorization"]??" ";
+    if(!token){
+        return;
+    }
+    //@ts-ignore
     const decoded=jwt.verify(token,JWT_SECRET) as {userId : string}
     if (decoded){
 
