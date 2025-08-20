@@ -37,14 +37,6 @@ export default function AuthPage() {
               className="p-3 rounded-lg border border-gray-300 focus:outline-orange-400"
               required
             />
-            {!isLogin && (
-              <input
-                type="password"
-                placeholder="Confirm Password"
-                className="p-3 rounded-lg border border-gray-300 focus:outline-orange-400"
-                required
-              />
-            )}
             <button
               type="submit"
               className="bg-[#ff7a27] hover:bg-[#ff974f] text-white font-semibold py-3 rounded-xl shadow transition"
@@ -68,12 +60,12 @@ export default function AuthPage() {
         <div className="w-1/2 relative bg-gradient-to-tr from-orange-400 via-orange-300 to-orange-500 max-md:h-56 max-md:w-full max-md:rounded-b-3xl max-md:flex max-md:items-center max-md:justify-center">
           <div className="absolute inset-0 flex flex-col justify-center items-center text-white p-12 max-md:static max-md:p-6 max-md:h-full">
             <h3 className="text-2xl font-bold mb-4 max-md:text-center">
-              {isLogin ? "New here?" : "Welcome Back!"}
+              {isLogin ? "Welcome Back!" : "New here?"}
             </h3>
             <p className="text-center max-md:text-sm">
               {isLogin
-                ? "Sign up and discover a great variety of delicious recipes."
-                : "Sign in to your account to enjoy all features."}
+                ? "Sign in to your account to enjoy all features."
+                : "Sign up and discover a great variety of delicious recipes."}
             </p>
             {/* Decorative image */}
             <img
