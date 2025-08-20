@@ -6,31 +6,31 @@ const coffeeList = [
   {
     name: "Black Coffee",
     description: "Delicious coffee should be simply coffee with nothing added, unless you add it yourself.",
-    img: "/black-coffee.png",
+    img: "/pulao-removebg-preview.png",
     color: "#6A5031"
   },
   {
     name: "Latte",
     description: "A creamy blend of espresso and steamed milk, topped with a light layer of foam.",
-    img: "/latte.png",
+    img: "/pulao-removebg-preview.png",
     color: "#E3Cfa2"
   },
   {
     name: "Cappuccino",
     description: "Espresso with steamed milk and thick foam; a popular Italian favorite.",
-    img: "/cappuccino.png",
+    img: "/pulao-removebg-preview.png",
     color: "#A7825e"
   },
   {
     name: "Mocha",
     description: "Chocolate, milk, espresso — a bittersweet delight for any time of day.",
-    img: "/mocha.png",
+    img: "/pulao-removebg-preview.png",
     color: "#6e605b"
   },
   {
     name: "Flat White",
     description: "Rich espresso mixed with steamed milk for a smooth, velvety taste.",
-    img: "/flatwhite.png",
+    img: "/pulao-removebg-preview.png",
     color: "#eee7dd"
   },
 ];
@@ -43,20 +43,34 @@ export default function Recipelist() {
   function handleSelect(idx) {
     if (idx === activeIdx) return;
     setActiveIdx(idx);
-    // Animation for cup image
+
+    // Different animation directions for cup image based on index mod 3
     if (cupRef.current) {
+      let fromVars;
+      switch (idx % 3) {
+        case 0:
+          fromVars = { opacity: 0, x: -80, scale: 0.8 };
+          break;
+        case 1:
+          fromVars = { opacity: 0, y: 60, scale: 0.8 };
+          break;
+        case 2:
+          fromVars = { opacity: 0, x: 80, scale: 0.8 };
+          break;
+      }
       gsap.fromTo(
         cupRef.current,
-        { opacity: 0, y: 60, scale: 0.8 },
-        { opacity: 1, y: 0, scale: 1, duration: 0.6, ease: "power2.out" }
+        fromVars,
+        { opacity: 1, x: 0, y: 0, scale: 1, duration: 0.6, ease: "power2.out" }
       );
     }
-    // Animation for description content
+
+    // Text animation from bottom always
     if (descRef.current) {
       gsap.fromTo(
         descRef.current,
-        { opacity: 0, x: 60 },
-        { opacity: 1, x: 0, duration: 0.6, ease: "power2.out" }
+        { opacity: 0, y: 50 },
+        { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" }
       );
     }
   }
@@ -74,13 +88,23 @@ export default function Recipelist() {
             src={coffeeList[activeIdx].img}
             alt={coffeeList[activeIdx].name}
             className="w-72 h-72 rounded-full shadow-2xl transition-all duration-700 bg-[#d0cbc5] object-contain"
-            key={activeIdx}
             draggable={false}
           />
-          {/* scattered beans/forks can be added as absolute images for more decoration */}
-          <img src="/spoon.png" alt="spoon" className="absolute left-16 bottom-24 w-14 opacity-80" />
-          <img src="/bean.png" alt="bean" className="absolute top-10 left-28 w-8 opacity-80" />
-          <img src="/bean.png" alt="bean" className="absolute right-16 top-32 w-7 opacity-80" />
+          <img
+            src="./different-aromatic-spices-falling-on-260nw-2422414553__1_-removebg-preview.png"
+            alt="spoon"
+            className="absolute left-16 bottom-24 w-14 opacity-80"
+          />
+          <img
+            src="./different-aromatic-spices-falling-on-260nw-2422414553__1_-removebg-preview.png"
+            alt="bean"
+            className="absolute top-10 left-28 w-8 opacity-80"
+          />
+          <img
+            src="./different-aromatic-spices-falling-on-260nw-2422414553__1_-removebg-preview.png"
+            alt="bean"
+            className="absolute right-16 top-32 w-7 opacity-80"
+          />
         </div>
 
         {/* Center Coffee Selector Dots */}
@@ -103,7 +127,7 @@ export default function Recipelist() {
 
         {/* Right Description Column */}
         <div className="flex-1 flex items-center justify-center bg-[#ede9e3] p-14 relative">
-          <div ref={descRef} key={activeIdx}>
+          <div ref={descRef}>
             <div className="flex items-center gap-4 mb-2">
               <span className="text-xs text-gray-500 tracking-widest">
                 {String(activeIdx + 1).padStart(2, '0')}
