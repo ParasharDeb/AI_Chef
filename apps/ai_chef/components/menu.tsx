@@ -1,4 +1,3 @@
-// Menu.tsx
 'use client'
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -21,11 +20,6 @@ export default function Menu() {
         rotate: 45,
         duration: 1,
         ease: "power2.out",
-        scrollTrigger: {
-          trigger: containerRef.current,
-          start: "top 80%",
-          toggleActions: "play reverse play reverse",
-        },
       });
     });
 
@@ -35,22 +29,11 @@ export default function Menu() {
       gsap.fromTo(
         txt,
         { opacity: 0, y: 50 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 1,
-          ease: "power2.out",
-          delay: 0.3,
-          scrollTrigger: {
-            trigger: containerRef.current,
-            start: "top 80%",
-            toggleActions: "play reverse play reverse",
-          },
-        }
+        { opacity: 1, y: 0, duration: 1, ease: "power2.out", delay: 0.3 }
       );
     });
 
-    // Animate left ingredient image: slide in/out on scroll
+    // Animate left ingredient image from left to right and vice versa with scroll
     gsap.fromTo(
       leftImgRef.current,
       { x: "-150%" },
@@ -58,23 +41,23 @@ export default function Menu() {
         x: "0%",
         scrollTrigger: {
           trigger: containerRef.current,
-          start: "top 80%",
+          start: "top bottom",
+          end: "bottom top",
           scrub: true,
-          toggleActions: "play reverse play reverse",
         },
       }
     );
     gsap.to(leftImgRef.current, {
-      x: "-150%",
+      x: "150%",
       scrollTrigger: {
         trigger: containerRef.current,
-        start: "bottom top",
+        start: "bottom bottom",
+        end: "bottom top+=200",
         scrub: true,
-        toggleActions: "play reverse play reverse",
       },
     });
 
-    // Animate right ingredient image: slide in/out on scroll
+    // Animate right ingredient image from right to left and vice versa with scroll
     gsap.fromTo(
       rightImgRef.current,
       { x: "150%" },
@@ -82,19 +65,19 @@ export default function Menu() {
         x: "0%",
         scrollTrigger: {
           trigger: containerRef.current,
-          start: "top 80%",
+          start: "top bottom",
+          end: "bottom top",
           scrub: true,
-          toggleActions: "play reverse play reverse",
         },
       }
     );
     gsap.to(rightImgRef.current, {
-      x: "150%",
+      x: "-150%",
       scrollTrigger: {
         trigger: containerRef.current,
-        start: "bottom top",
+        start: "bottom bottom",
+        end: "bottom top+=200",
         scrub: true,
-        toggleActions: "play reverse play reverse",
       },
     });
 
@@ -106,9 +89,9 @@ export default function Menu() {
         y: "0%",
         scrollTrigger: {
           trigger: containerRef.current,
-          start: "top 80%",
+          start: "top bottom",
+          end: "bottom top",
           scrub: true,
-          toggleActions: "play reverse play reverse",
         },
       }
     );
@@ -116,9 +99,9 @@ export default function Menu() {
       y: "-150%",
       scrollTrigger: {
         trigger: containerRef.current,
-        start: "bottom top",
+        start: "bottom bottom",
+        end: "bottom top+=200",
         scrub: true,
-        toggleActions: "play reverse play reverse",
       },
     });
   }, []);
@@ -126,7 +109,7 @@ export default function Menu() {
   return (
     <div
       ref={containerRef}
-      className="relative flex flex-col items-center w-full min-h-screen overflow-x-hidden bg-[url('/marble-bg.jpg')] bg-cover py-12"
+      className="relative flex flex-col items-center w-screen min-h-screen bg-[url('/marble-bg.jpg')] bg-cover py-12"
     >
       {/* Section Header */}
       <h2 className="text-3xl font-bold mb-2">What's on our Plate</h2>
@@ -140,7 +123,7 @@ export default function Menu() {
         <button className="mx-2 px-4 py-2 text-gray-500">Dessert</button>
       </div>
       {/* Dishes */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-12 w-full max-w-4xl mx-auto">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-12 w-full max-w-4xl">
         {/* Stirred Egg */}
         <div className="text flex flex-col items-center">
           <img
@@ -187,7 +170,7 @@ export default function Menu() {
       />
       <img
         ref={leftImgRef}
-        src="./live-pink-crayfish-removebg-preview.png"
+        src="./figure out"
         alt="peas"
         className="absolute top-0 left-24 w-24 hidden md:block"
       />

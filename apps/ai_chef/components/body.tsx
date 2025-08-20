@@ -1,54 +1,21 @@
 'use client'
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { useGSAP } from "@gsap/react";
-import { useRef } from "react";
-
-gsap.registerPlugin(ScrollTrigger);
+import gsap from 'gsap'
+import { useGSAP } from '@gsap/react'
+import { useRef } from 'react'
 
 export default function Mainbody() {
-  const containerRef = useRef(null);
   const dumplingRef = useRef(null);
 
   useGSAP(() => {
-    // Animate dumpling image rotation with scroll trigger to restart on scroll back
-    gsap.to(dumplingRef.current, {
-      rotate: 180,
-      duration: 1.5,
-      ease: "power2.out",
-      scrollTrigger: {
-        trigger: containerRef.current,
-        start: "top 80%",
-        toggleActions: "play reverse play reverse"
-      }
-    });
-
-    // Animate text fade and slide in with scroll trigger to restart on scroll back
-    const texts = gsap.utils.toArray(".text-animation");
-    texts.forEach((txt) => {
-      gsap.fromTo(
-        txt,
-        { opacity: 0, y: 50 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 1,
-          ease: "power2.out",
-          scrollTrigger: {
-            trigger: containerRef.current,
-            start: "top 80%",
-            toggleActions: "play reverse play reverse"
-          }
-        }
-      );
-    });
+    gsap.fromTo(
+      dumplingRef.current,
+      { rotate: 0 },
+      { rotate: 180, duration: 1.5, ease: "power2.out" }
+    );
   }, []);
 
   return (
-    <div
-      ref={containerRef}
-      className="relative h-screen w-full overflow-x-hidden"
-    >
+    <div className="relative h-screen w-full overflow-x-hidden">
       {/* Navigation Bar */}
       <div className="absolute top-6 left-10 flex items-center gap-8 z-20">
         <span className="text-lg font-bold">luscious</span>
@@ -71,7 +38,7 @@ export default function Mainbody() {
       {/* Content Layout */}
       <div className="flex flex-row justify-between items-center h-full w-full max-w-6xl mx-auto pt-36 pb-16 px-4 sm:px-8">
         {/* Left text content */}
-        <div className="flex flex-col justify-center max-w-[430px] w-full text-animation">
+        <div className="flex flex-col justify-center max-w-[430px] w-full">
           <h2 className="text-5xl font-bold leading-tight mb-5">
             Take a taste<br />
             Come join us.
