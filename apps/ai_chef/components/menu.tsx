@@ -2,7 +2,7 @@
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -12,99 +12,98 @@ export default function Menu() {
   const rightImgRef = useRef(null);
   const bottomImgRef = useRef(null);
 
+  // State to track active tab for underline
+  const [activeTab, setActiveTab] = useState("Main Dish");
+
+  // Store references to the animations to restart on click
+  const animationsRef = useRef([]);
+
   useGSAP(() => {
+    const animations = [];
+
     // Animate images: rotate only
     const images = gsap.utils.toArray("img.rounded-full");
     images.forEach((img) => {
-      gsap.to(img, {
+      const anim = gsap.to(img, {
         rotate: 45,
         duration: 1,
         ease: "power2.out",
+        paused: true,
       });
+      animations.push(anim);
     });
 
     // Animate all text: fade in and move up
     const texts = gsap.utils.toArray(".text > h3, .text > p, h2, p, .flex.mb-10");
     texts.forEach((txt) => {
-      gsap.fromTo(
+      const anim = gsap.fromTo(
         txt,
         { opacity: 0, y: 50 },
-        { opacity: 1, y: 0, duration: 1, ease: "power2.out", delay: 0.3 }
+        {
+          opacity: 1,
+          y: 0,
+          duration: 1,
+          ease: "power2.out",
+          delay: 0.3,
+          paused: true,
+        }
       );
+      animations.push(anim);
     });
 
-    // Animate left ingredient image from left to right and vice versa with scroll
-    gsap.fromTo(
+    // Animate left ingredient image: slide in/out on scroll
+    const leftAnim = gsap.fromTo(
       leftImgRef.current,
       { x: "-150%" },
       {
         x: "0%",
-        scrollTrigger: {
-          trigger: containerRef.current,
-          start: "top bottom",
-          end: "bottom top",
-          scrub: true,
-        },
+        duration: 1,
+        ease: "power2.out",
+        paused: true,
       }
     );
-    gsap.to(leftImgRef.current, {
-      x: "150%",
-      scrollTrigger: {
-        trigger: containerRef.current,
-        start: "bottom bottom",
-        end: "bottom top+=200",
-        scrub: true,
-      },
-    });
+    animations.push(leftAnim);
 
-    // Animate right ingredient image from right to left and vice versa with scroll
-    gsap.fromTo(
+    // Animate right ingredient image: slide in/out on scroll
+    const rightAnim = gsap.fromTo(
       rightImgRef.current,
       { x: "150%" },
       {
         x: "0%",
-        scrollTrigger: {
-          trigger: containerRef.current,
-          start: "top bottom",
-          end: "bottom top",
-          scrub: true,
-        },
+        duration: 1,
+        ease: "power2.out",
+        paused: true,
       }
     );
-    gsap.to(rightImgRef.current, {
-      x: "-150%",
-      scrollTrigger: {
-        trigger: containerRef.current,
-        start: "bottom bottom",
-        end: "bottom top+=200",
-        scrub: true,
-      },
-    });
+    animations.push(rightAnim);
 
     // Animate bottom ingredient (optional): slide up from bottom
-    gsap.fromTo(
+    const bottomAnim = gsap.fromTo(
       bottomImgRef.current,
       { y: "150%" },
       {
         y: "0%",
-        scrollTrigger: {
-          trigger: containerRef.current,
-          start: "top bottom",
-          end: "bottom top",
-          scrub: true,
-        },
+        duration: 1,
+        ease: "power2.out",
+        paused: true,
       }
     );
-    gsap.to(bottomImgRef.current, {
-      y: "-150%",
-      scrollTrigger: {
-        trigger: containerRef.current,
-        start: "bottom bottom",
-        end: "bottom top+=200",
-        scrub: true,
-      },
-    });
+    animations.push(bottomAnim);
+
+    animationsRef.current = animations;
+
+    // On initial load: play all animations
+    animations.forEach((anim) => anim.play());
   }, []);
+
+  // Handler to restart all animations and update active tab
+  function handleTabClick(tabName) {
+    setActiveTab(tabName);
+    if (!animationsRef.current) return;
+    animationsRef.current.forEach((anim) => {
+      anim.restart();
+    });
+  }
 
   return (
     <div
@@ -114,14 +113,24 @@ export default function Menu() {
       {/* Section Header */}
       <h2 className="text-3xl font-bold mb-2">What's on our Plate</h2>
       <p className="mb-6 text-gray-600 text-center">Please serve yourself without any hesitate</p>
-      {/* Tabs */}
+
+      {/* Tabs with active underline */}
       <div className="flex mb-10 justify-center">
-        <button className="mx-2 px-4 py-2 text-gray-500">Appetizers</button>
-        <button className="mx-2 px-4 py-2 text-black border-b-2 border-orange-400 font-bold">
-          Main Dish
-        </button>
-        <button className="mx-2 px-4 py-2 text-gray-500">Dessert</button>
+        {["Appetizers", "Main Dish", "Dessert"].map((tab) => (
+          <button
+            key={tab}
+            onClick={() => handleTabClick(tab)}
+            className={`mx-2 px-4 py-2 font-medium ${
+              activeTab === tab
+                ? "text-black border-b-2 border-orange-400 font-bold"
+                : "text-gray-500"
+            } cursor-pointer`}
+          >
+            {tab}
+          </button>
+        ))}
       </div>
+
       {/* Dishes */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-12 w-full max-w-4xl">
         {/* Stirred Egg */}
@@ -161,6 +170,7 @@ export default function Menu() {
           </p>
         </div>
       </div>
+
       {/* Decorative ingredient images */}
       <img
         ref={rightImgRef}
@@ -170,7 +180,7 @@ export default function Menu() {
       />
       <img
         ref={leftImgRef}
-        src="./figure out"
+        src="./live-pink-crayfish-removebg-preview.png"
         alt="peas"
         className="absolute top-0 left-24 w-24 hidden md:block"
       />
