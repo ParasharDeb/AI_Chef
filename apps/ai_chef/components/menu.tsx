@@ -33,7 +33,7 @@ export default function Menu() {
       );
     });
 
-    // Animate left ingredient image from left to right and vice versa with scroll
+    // Animate left ingredient image: slide in/out on scroll
     gsap.fromTo(
       leftImgRef.current,
       { x: "-150%" },
@@ -42,22 +42,22 @@ export default function Menu() {
         scrollTrigger: {
           trigger: containerRef.current,
           start: "top bottom",
-          end: "bottom top",
+          end: "center center",
           scrub: true,
         },
       }
     );
     gsap.to(leftImgRef.current, {
-      x: "150%",
+      x: "-150%",
       scrollTrigger: {
         trigger: containerRef.current,
-        start: "bottom bottom",
-        end: "bottom top+=200",
+        start: "center center",
+        end: "bottom top",
         scrub: true,
       },
     });
 
-    // Animate right ingredient image from right to left and vice versa with scroll
+    // Animate right ingredient image: slide in/out on scroll
     gsap.fromTo(
       rightImgRef.current,
       { x: "150%" },
@@ -66,17 +66,17 @@ export default function Menu() {
         scrollTrigger: {
           trigger: containerRef.current,
           start: "top bottom",
-          end: "bottom top",
+          end: "center center",
           scrub: true,
         },
       }
     );
     gsap.to(rightImgRef.current, {
-      x: "-150%",
+      x: "150%",
       scrollTrigger: {
         trigger: containerRef.current,
-        start: "bottom bottom",
-        end: "bottom top+=200",
+        start: "center center",
+        end: "bottom top",
         scrub: true,
       },
     });
@@ -109,7 +109,7 @@ export default function Menu() {
   return (
     <div
       ref={containerRef}
-      className="relative flex flex-col items-center w-screen min-h-screen bg-[url('/marble-bg.jpg')] bg-cover py-12"
+      className="relative flex flex-col items-center w-full min-h-screen bg-[url('/marble-bg.jpg')] bg-cover py-12"
     >
       {/* Section Header */}
       <h2 className="text-3xl font-bold mb-2">What's on our Plate</h2>
@@ -170,7 +170,7 @@ export default function Menu() {
       />
       <img
         ref={leftImgRef}
-        src="./figure out"
+        src="./live-pink-crayfish-removebg-preview.png"
         alt="peas"
         className="absolute top-0 left-24 w-24 hidden md:block"
       />

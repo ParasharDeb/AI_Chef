@@ -8,7 +8,7 @@ export default function Mainbody(){
     },[])
     const boxref=useRef(null)
     return(
-        <div className=' py-10 grid grid-cols-5 gap-4'>
+        <div className=' py-10 grid grid-cols-5 gap-4 h-screen'>
                 <div className=" rounded-full h-100 w-100 col-span-2" ref={boxref}>
 
                 </div>

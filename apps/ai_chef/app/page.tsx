@@ -4,11 +4,11 @@ import Navbara from "@/components/Navbar";
 
 export default function Home() {
   return (
-    <div className="bg-paper w-100vw h-100vh">
+    <div className="bg-paper w-screen h-100vh">
     <div><Navbara/></div>
     <div><Mainbody/></div>
     <div><Menu/></div>
-    <div className="w-screen h-screen"></div>
+    <div className="h-screen"></div>
     </div>
   );
 }
