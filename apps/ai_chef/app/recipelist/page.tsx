@@ -1,5 +1,5 @@
 'use client'
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import gsap from "gsap";
 
 const coffeeList = [
@@ -39,12 +39,51 @@ export default function Recipelist() {
   const [activeIdx, setActiveIdx] = useState(0);
   const cupRef = useRef(null);
   const descRef = useRef(null);
+  const leftOnionRef1 = useRef(null);
+  const leftOnionRef2 = useRef(null);
+  const rightOnionRef = useRef(null);
+
+  useEffect(() => {
+    // Animate big pulao image from top
+    if (cupRef.current) {
+      gsap.fromTo(
+        cupRef.current,
+        { y: -150, opacity: 0 },
+        { y: 0, opacity: 1, duration: 1, ease: "power2.out" }
+      );
+    }
+
+    // Animate left onions from left
+    if (leftOnionRef1.current) {
+      gsap.fromTo(
+        leftOnionRef1.current,
+        { x: -100, opacity: 0 },
+        { x: 0, opacity: 1, duration: 1, delay: 0.3, ease: "power2.out" }
+      );
+    }
+    if (leftOnionRef2.current) {
+      gsap.fromTo(
+        leftOnionRef2.current,
+        { x: -120, opacity: 0 },
+        { x: 0, opacity: 1, duration: 1, delay: 0.5, ease: "power2.out" }
+      );
+    }
+
+    // Animate right onion from right
+    if (rightOnionRef.current) {
+      gsap.fromTo(
+        rightOnionRef.current,
+        { x: 100, opacity: 0 },
+        { x: 0, opacity: 1, duration: 1, delay: 0.7, ease: "power2.out" }
+      );
+    }
+  }, [activeIdx]);
 
   function handleSelect(idx) {
     if (idx === activeIdx) return;
     setActiveIdx(idx);
 
-    // Different animation directions for cup image based on index mod 3
+    // Different animation directions for cup image on change
     if (cupRef.current) {
       let fromVars;
       switch (idx % 3) {
@@ -65,7 +104,7 @@ export default function Recipelist() {
       );
     }
 
-    // Text animation from bottom always
+    // Text animation
     if (descRef.current) {
       gsap.fromTo(
         descRef.current,
@@ -90,19 +129,23 @@ export default function Recipelist() {
             className="w-72 h-72 rounded-full shadow-2xl transition-all duration-700 bg-[#d0cbc5] object-contain"
             draggable={false}
           />
+          {/* Onions with animation refs */}
           <img
+            ref={leftOnionRef1}
             src="./different-aromatic-spices-falling-on-260nw-2422414553__1_-removebg-preview.png"
-            alt="spoon"
+            alt="onion left 1"
             className="absolute left-16 bottom-24 w-14 opacity-80"
           />
           <img
+            ref={leftOnionRef2}
             src="./different-aromatic-spices-falling-on-260nw-2422414553__1_-removebg-preview.png"
-            alt="bean"
+            alt="onion left 2"
             className="absolute top-10 left-28 w-8 opacity-80"
           />
           <img
+            ref={rightOnionRef}
             src="./different-aromatic-spices-falling-on-260nw-2422414553__1_-removebg-preview.png"
-            alt="bean"
+            alt="onion right"
             className="absolute right-16 top-32 w-7 opacity-80"
           />
         </div>
@@ -113,7 +156,7 @@ export default function Recipelist() {
             <button
               key={idx}
               onClick={() => handleSelect(idx)}
-              className="w-5 h-5 rounded-full border-2 border-gray-300"
+              className="w-5 h-5 rounded-full border-2 border-gray-300 cursor-pointer"
               style={{
                 background: coffee.color,
                 outline: activeIdx === idx ? "2px solid #d47a37" : undefined,
@@ -139,17 +182,11 @@ export default function Recipelist() {
             <p className="text-gray-600 mb-7 max-w-md leading-relaxed">
               {coffeeList[activeIdx].description}
             </p>
-            <button className="bg-[#c89a6b] hover:bg-[#b37e47] transition text-white font-semibold px-7 py-3 rounded-lg shadow w-max">
-              ORDER NOW
+            <button className="bg-[#c89a6b] hover:bg-[#b37e47] transition text-white font-semibold px-7 py-3 rounded-lg shadow w-max cursor-pointer">
+              VIEW FULL RECIPE
             </button>
           </div>
 
-          {/* Social icons */}
-          <div className="absolute top-7 right-10 flex gap-4">
-            <a href="#" className="text-gray-400 hover:text-black"><i className="fab fa-facebook-f" /></a>
-            <a href="#" className="text-gray-400 hover:text-black"><i className="fab fa-instagram" /></a>
-            <a href="#" className="text-gray-400 hover:text-black"><i className="fab fa-youtube" /></a>
-          </div>
         </div>
       </div>
     </div>
