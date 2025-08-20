@@ -54,10 +54,10 @@ export default function LargeRecipe() {
   return (
     <div
       ref={sectionRef}
-      className="relative bg-[url('/marble-bg.jpg')] bg-cover h-screen w-full py-8 px-6 sm:px-20"
+      className="relative bg-[url('/marble-bg.jpg')] bg-cover h-screen w-full py-40 px-6 sm:px-20"
     >
       {/* Decorative images */}
-      <img ref={decorImgRefs[0]} src="/star-anise.png" alt="star-anise" className="absolute right-14 top-8 w-24" />
+      <img ref={decorImgRefs[0]} src="/star-anise.png" alt="star-anise" className="absolute right-14 top-40 w-24" />
       <img ref={decorImgRefs[1]} src="/pepper.png" alt="pepper" className="absolute right-48 top-16 w-8" />
       <img ref={decorImgRefs[2]} src="/tomato.png" alt="tomato" className="absolute left-10 bottom-16 w-14" />
       <img ref={decorImgRefs[3]} src="/bokchoy.png" alt="bokchoy" className="absolute right-4 bottom-4 w-36" />
@@ -67,7 +67,7 @@ export default function LargeRecipe() {
       <div className="absolute left-16 top-16 z-10" ref={plateRef}>
         <img src="/noodles-plate.png" alt="Recipe Plate" className="w-80 sm:w-96 drop-shadow-2xl" />
         {/* Optional chopstick overlay if needed */}
-        <img src="/chopsticks.png" alt="Chopsticks" className="absolute left-4 top-6 w-60 pointer-events-none" />
+        <img src="/chopsticks.png" alt="Chopsticks" className="absolute left-4 top-40 w-60 pointer-events-none" />
       </div>
 
       {/* Right Side: Review Section */}
@@ -77,7 +77,7 @@ export default function LargeRecipe() {
         <div className="mb-7 mt-2">
           <p className="text-gray-700 text-base leading-relaxed">
             <span role="img" aria-label="Quote" className="text-xl">🗨️</span>
-            I’m currently on the tour with Paula Abdul and while we were performing in town I came across your raw chocolate fudge at Whole Foods. OMG!!! I was nice enough to share it with Paula Abdul, the Physical therapist and the glam squad. Of course they all agreed with me! So glad we are coming back next week 😋
+            I’m currently on the tour with Shivayan Talukdar and while we were performing in town I came across your raw chocolate fudge at Whole Foods. OMG!!! I was nice enough to share it with Paula Abdul, the Physical therapist and the glam squad. Of course they all agreed with me! So glad we are coming back next week 😋
           </p>
         </div>
         {/* Avatars */}
