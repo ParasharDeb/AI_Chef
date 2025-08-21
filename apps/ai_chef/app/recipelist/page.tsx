@@ -115,7 +115,7 @@ export default function Recipelist() {
   }
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-[#ede9e3] font-serif">
+    <div className="min-h-screen w-full flex items-center justify-center bg-paper font-serif">
       <div className="bg-white max-w-5xl w-full rounded-3xl shadow-xl flex overflow-hidden relative">
         {/* Left Visual Column */}
         <div
@@ -182,7 +182,7 @@ export default function Recipelist() {
             <p className="text-gray-600 mb-7 max-w-md leading-relaxed">
               {coffeeList[activeIdx].description}
             </p>
-            <button className="bg-[#c89a6b] hover:bg-[#b37e47] transition text-white font-semibold px-7 py-3 rounded-lg shadow w-max cursor-pointer">
+            <button className="bg-orange-400 hover:bg-[#b37e47] transition text-white font-semibold px-7 py-3 rounded-lg shadow w-max cursor-pointer">
               VIEW FULL RECIPE
             </button>
           </div>

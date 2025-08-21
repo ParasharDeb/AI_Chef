@@ -7,7 +7,7 @@ export default function AuthPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#f6f5f3] px-6 py-12 relative overflow-hidden font-sans">
       {/* Background pattern or image if needed */}
-      <div className="absolute inset-0 bg-[url('/marble-bg.jpg')] bg-cover opacity-20 -z-10"></div>
+      <div className="absolute inset-0 bg-[url('/marble-bg.jpg')] bg-paper opacity-20 -z-10"></div>
 
       <div className="bg-white rounded-3xl shadow-xl max-w-4xl w-full flex overflow-hidden max-md:flex-col">
         {/* Left side - form */}
@@ -67,13 +67,6 @@ export default function AuthPage() {
                 ? "Sign in to your account to enjoy all features."
                 : "Sign up and discover a great variety of delicious recipes."}
             </p>
-            {/* Decorative image */}
-            <img
-              src="/spices-orange.png"
-              alt="Spices"
-              className="mt-8 max-md:mt-4 w-36 max-md:w-24 object-contain select-none"
-              draggable={false}
-            />
           </div>
         </div>
       </div>
