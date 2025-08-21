@@ -21,7 +21,7 @@ export default function Signup(){
                             password,
                         }).then((response) => {
                             Router.push("/")
-                            localStorage.setItem("token",response.data.token)
+                            localStorage.setItem("token",response.data.token) 
                         })
                     }}/>
             </div>

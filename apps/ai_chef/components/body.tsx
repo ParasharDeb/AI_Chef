@@ -2,10 +2,10 @@
 import gsap from 'gsap'
 import { useGSAP } from '@gsap/react'
 import { useRef } from 'react'
-
+import { useRouter } from 'next/navigation'
 export default function Mainbody() {
   const dumplingRef = useRef(null);
-
+  const Router=useRouter();
   useGSAP(() => {
     gsap.fromTo(
       dumplingRef.current,
@@ -25,7 +25,7 @@ export default function Mainbody() {
         <a href="#" className="text-base text-gray-700 hover:text-[#ff7a27] font-medium">Recipes</a>
         <a href="#" className="text-base text-gray-700 hover:text-[#ff7a27] font-medium">Food Menu</a>
         <a href="#" className="text-base text-gray-700 hover:text-[#ff7a27] font-medium">Order Now</a>
-        <button className="ml-3 px-6 py-2 border-2 border-[#ff7a27] text-[#ff7a27] rounded-full font-semibold hover:bg-[#ff7a27] hover:text-white transition">Login</button>
+        <button className="ml-3 px-6 py-2 border-2 border-[#ff7a27] text-[#ff7a27] rounded-full font-semibold hover:bg-[#ff7a27] hover:text-white transition cursor-pointer" onClick={()=>{Router.push("/signin")}}>Login</button>
       </div>
 
       {/* Top-Left Spices */}
