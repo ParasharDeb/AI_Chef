@@ -20,7 +20,9 @@ userrouter.post("/signup", async (req, res) => {
       data: {
         username:parseddata.data?.username,
         email:parseddata.data.email,
-        password:hashedpassword
+        password:hashedpassword,
+        likes:0,
+        dislikes:0
       }
     });
   } catch (err) {

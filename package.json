@@ -1,5 +1,5 @@
 {
-  "name": "AI_Ched",
+  "name": "ai_chef",
   "private": true,
   "scripts": {
     "build": "turbo run build",

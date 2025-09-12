@@ -1,16 +1,2 @@
-export const navLinks = [
- 
- {
-	id: "Recipes",
-	title: "Recipes",
- },
- {
-	id: "Ask AI",
-	title: "Ask_AI",
- },
- {
-	id: "contact",
-	title: "Contact",
- },
- 
-];
+//TODO
+//SHould have all the details and other jargon

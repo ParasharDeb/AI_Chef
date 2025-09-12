@@ -6,12 +6,18 @@ import { useRouter } from 'next/navigation'
 export default function Mainbody() {
   const dumplingRef = useRef(null);
   const Router=useRouter();
+  const spiceref=useRef(null)
   useGSAP(() => {
     gsap.fromTo(
       dumplingRef.current,
       {xPercent: 100, autoAlpha: 0    }, 
       {xPercent: 0, autoAlpha: 1, duration: 1,ease: "power1.out"}
     );
+    gsap.fromTo(
+      spiceref.current,
+      {xPercent:-100,autoAlpha:0},
+      {xPercent:0,autoAlpha:1,duration:1,ease:"power1.out"}
+    )
   }, []);
 
   return (
@@ -29,7 +35,7 @@ export default function Mainbody() {
       </div>
 
       {/* Top-Left Spices */}
-      <img src="/spoon-spices.png" alt="Spices" className="absolute left-10 top-20 w-44 z-10 pointer-events-none" />
+      <img src="/spices.png" alt="Spices" ref={spiceref} className="absolute left-10 top-20 w-44 z-10 pointer-events-none" />
       {/* Top-Right Tomatoes */}
       <img src="/tomato-vine.png" alt="Tomatoes" className="absolute right-10 top-24 w-24 z-10 pointer-events-none" />
       {/* Bottom-Left Sauce Bowl */}
@@ -62,11 +68,7 @@ export default function Mainbody() {
             alt="Dumplings on Plate"
             className="w-[540px] z-20"
           />
-          <img
-            src="/chopsticks.png"
-            alt="Chopsticks"
-            className="absolute left-8 top-10 w-[180px] sm:w-[200px] z-30"
-          />
+
         </div>
       </div>
     </div>

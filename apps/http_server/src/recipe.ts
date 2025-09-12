@@ -24,9 +24,12 @@ reciperouter.post("/addrecipe",middleware,async(req:Authrequest,res:Response)=>{
     await prismaclient.recipe.create({
         data:{
             Description:parseddata.data?.description,
+            Type:parseddata.data.Type,
             Title:parseddata.data.title,
             ImageUrl:parseddata.data.imageurl,
-            userId:userId
+            userId:userId,
+            Likes:0,
+            Dislikes:0
         }
     })
     res.json({
