@@ -9,8 +9,8 @@ export default function Mainbody() {
   useGSAP(() => {
     gsap.fromTo(
       dumplingRef.current,
-      { rotate: 0 },
-      { rotate: 180, duration: 1.5, ease: "power2.out" }
+      {xPercent: 100, autoAlpha: 0    }, 
+      {xPercent: 0, autoAlpha: 1, duration: 1,ease: "power1.out"}
     );
   }, []);
 
@@ -21,10 +21,10 @@ export default function Mainbody() {
         <span className="text-lg font-bold">luscious</span>
       </div>
       <div className="absolute top-6 right-12 flex items-center gap-8 z-20">
-        <a href="#" className="text-base text-gray-700 hover:text-[#ff7a27] font-medium">Dumplings</a>
-        <a href="#" className="text-base text-gray-700 hover:text-[#ff7a27] font-medium">Recipes</a>
-        <a href="#" className="text-base text-gray-700 hover:text-[#ff7a27] font-medium">Food Menu</a>
-        <a href="#" className="text-base text-gray-700 hover:text-[#ff7a27] font-medium">Order Now</a>
+        <a href="#" className="text-base text-gray-700 hover:text-[#ff7a27] font-medium">AI recipes</a>
+        <a href="/recipelist" className="text-base text-gray-700 hover:text-[#ff7a27] font-medium">Recipes</a>
+        <a href="#" className="text-base text-gray-700 hover:text-[#ff7a27] font-medium">About</a>
+        <a href="#" className="text-base text-gray-700 hover:text-[#ff7a27] font-medium">Contact</a>
         <button className="ml-3 px-6 py-2 border-2 border-[#ff7a27] text-[#ff7a27] rounded-full font-semibold hover:bg-[#ff7a27] hover:text-white transition cursor-pointer" onClick={()=>{Router.push("/signin")}}>Login</button>
       </div>
 
@@ -36,9 +36,9 @@ export default function Mainbody() {
       <img src="/sauce-bowl.png" alt="Sauce Bowl" className="absolute left-24 bottom-9 w-32 z-10 pointer-events-none" />
 
       {/* Content Layout */}
-      <div className="flex flex-row justify-between items-center h-full w-full max-w-6xl mx-auto pt-36 pb-16 px-4 sm:px-8">
+      <div className="grid grid-cols-12 h-full w-full max-w-6xl mx-auto pt-36 pb-16 px-4 sm:px-8">
         {/* Left text content */}
-        <div className="flex flex-col justify-center max-w-[430px] w-full">
+        <div className="flex flex-col justify-center max-w-[430px] w-full col-span-7">
           <h2 className="text-5xl font-bold leading-tight mb-5">
             Take a taste<br />
             Come join us.
@@ -49,18 +49,18 @@ export default function Mainbody() {
           <p className="text-xs text-gray-400 max-w-xs mb-7">
             Dumpling is a broad classification for a dish that consists of pieces of dough made from a variety of starch sources wrapped around a filling, or of dough with no filling.
           </p>
-          <button className="bg-[#ff7a27] hover:bg-[#ff974f] transition text-white font-semibold px-7 py-3 rounded-xl shadow w-max">
+          <button className="ml-3 px-6 py-2 border-2 border-[#ff7a27] text-[#ff7a27] rounded-full font-semibold hover:bg-[#ff7a27] hover:text-white transition cursor-pointer w-50">
             Explore Now
           </button>
         </div>
 
         {/* Dumpling image + Chopsticks */}
-        <div className="relative flex items-center justify-center min-w-[180px] max-w-[320px] w-full">
+        <div className="relative flex items-center justify-center  col-span-5">
           <img
             ref={dumplingRef}
-            src="/dumplings-plate.png"
+            src="/momo.png"
             alt="Dumplings on Plate"
-            className="w-full max-w-[320px] z-20"
+            className="w-[540px] z-20"
           />
           <img
             src="/chopsticks.png"

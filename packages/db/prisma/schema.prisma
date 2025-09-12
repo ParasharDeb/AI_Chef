@@ -12,14 +12,19 @@ model User{
   username          String    
   email             String    @unique
   password          String
+  likes             Int
+  dislikes          Int
   Recipes           Recipe[]
 }
 
 model Recipe{
   id               Int        @id @default(autoincrement())
   Title            String
+  Type             String
+  Likes            Int
+  Dislikes         Int
   Description      String
-  userId         String
+  userId           String
   User             User       @relation(fields: [userId],references: [id])
-  ImageUrl         String?
+  ImageUrl         String
 }

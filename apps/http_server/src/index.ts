@@ -11,4 +11,4 @@ app.use("/api/v1",routes)
 routes.use("/user",userrouter),
 routes.use("/recipe",reciperouter),
 routes.use("/generate",airouter),
-app.listen(3001);
+app.listen(8080);

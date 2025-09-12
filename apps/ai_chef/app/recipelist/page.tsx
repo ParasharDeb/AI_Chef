@@ -15,6 +15,7 @@ const coffeeList = [
     img: "/pulao-removebg-preview.png",
     color: "#E3Cfa2"
   },
+  
   {
     name: "Cappuccino",
     description: "Espresso with steamed milk and thick foam; a popular Italian favorite.",
@@ -126,7 +127,7 @@ export default function Recipelist() {
             ref={cupRef}
             src={coffeeList[activeIdx].img}
             alt={coffeeList[activeIdx].name}
-            className="w-72 h-72 rounded-full shadow-2xl transition-all duration-700 bg-[#d0cbc5] object-contain"
+            className="w-72 h-72 rounded-full transition-all duration-700  object-contain"
             draggable={false}
           />
           {/* Onions with animation refs */}
@@ -182,7 +183,7 @@ export default function Recipelist() {
             <p className="text-gray-600 mb-7 max-w-md leading-relaxed">
               {coffeeList[activeIdx].description}
             </p>
-            <button className="bg-orange-400 hover:bg-[#b37e47] transition text-white font-semibold px-7 py-3 rounded-lg shadow w-max cursor-pointer">
+            <button className="ml-3 px-6 py-2 border-2 border-[#ff7a27] text-[#ff7a27] rounded-full font-semibold hover:bg-[#ff7a27] hover:text-white transition cursor-pointer w-70">
               VIEW FULL RECIPE
             </button>
           </div>
