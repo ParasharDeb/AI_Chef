@@ -1,14 +1,30 @@
 'use client'
 import {Button} from "@repo/ui/button"
 import { Inputbox } from "@repo/ui/input"
+import axios from "axios"
+
+import { useState } from "react"
 export default function Signup(){
+    const [email,setemail]=useState("")
+    const [password,setpassword]=useState("")
+    function Singin(){
+        axios.post("http://localhost:8080/api/v1/user/signin",{
+            email,password
+        }).then(
+            Response=>{
+                console.log(Response)
+            }
+        ).catch(error=>{
+            console.log(error)
+        })
+    }
     return(
         <div className="bg-paper flex w-screen h-screen justify-center items-center">
             <div className="isolate aspect-video w-96 h-fit rounded-xl bg-white/20 shadow-lg ring-1 ring-black/5 px-5 py-10">
                 <div className="text-[#ff7a29] font-bold text-4xl font-mono ml-25">Signup</div>
-                <Inputbox Changehandler={(e)=>{console.log(e.target.value)}} type="text" placeholder="password" Title="Password"/>
-                <Inputbox Changehandler={(e)=>{console.log(e.target.value)}} type="text" placeholder="Email" Title="Email"/>
-                <Button children="Signup" clickhandler={()=>alert("hi")}/>
+                <Inputbox Changehandler={(e)=>{setemail(e.target.value)}} type="text" placeholder="password" Title="Password"/>
+                <Inputbox Changehandler={(e)=>{setpassword(e.target.value)}} type="text" placeholder="Email" Title="Email"/>
+                <Button children="Signup" clickhandler={Singin}/>
                 {/* SHould have a footer  */}
                 <div>
 
