@@ -23,6 +23,7 @@ const dish=new schema({
     name:{type:String,required:true},
     category:{type:String,required:true},
     description:{type:String},
+    available:{type:Boolean,required:true,default:true},
     price:{type:Number,required:true},
     image:{type:String,required:true}
 })

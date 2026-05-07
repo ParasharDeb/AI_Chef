@@ -313,42 +313,63 @@ export default function AdminMenuManager({ onLogout }) {
           <div className="table-wrap">
             <table className="menu-table">
               <thead>
-                <tr>
-                  <th>Item</th>
-                  <th>Category</th>
-                  <th>Price</th>
-                  <th>Rating</th>
-                  <th>Badge</th>
-                  <th>Available</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
+  <tr>
+    <th>Item</th>
+    <th>Category</th>
+    <th>Actions</th>
+  </tr>
+</thead>
               <tbody>
-                {filtered.map((item, idx) => (
-                  <tr key={item.id} style={{ animationDelay: `${idx * 0.04}s` }} className="table-row">
-                    <td>
-                      <div className="item-cell">
-                        <span className="table-emoji">{item.emoji}</span>
-                        <div>
-                          <p className="table-name">{item.name}</p>
-                          <p className="table-desc">{item.desc.slice(0, 42)}…</p>
-                        </div>
-                      </div>
-                    </td>
-                    <td><span className="table-cat">{item.category}</span></td>
-                    <td><span className="table-price">₹{item.price}</span></td>
-                    <td><span className="table-rating">⭐ {item.rating}</span></td>
-                    <td>{item.tag ? <span className="table-tag">{item.tag}</span> : <span className="table-notag">—</span>}</td>
-                    <td><ToggleSwitch checked={item.available} onChange={() => toggleAvail(item.id)} /></td>
-                    <td>
-                      <div className="action-btns">
-                        <button className="action-edit" onClick={() => setEditing(item)}>✏️ Edit</button>
-                        <button className="action-del" onClick={() => setDeleteId(item.id)}>🗑️</button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
+  {filtered.map((item, idx) => (
+    <tr
+      key={item.id}
+      style={{ animationDelay: `${idx * 0.04}s` }}
+      className="table-row"
+    >
+      <td>
+        <div className="item-cell">
+          <span className="table-emoji">
+            {item.emoji}
+          </span>
+
+          <div>
+            <p className="table-name">
+              {item.name}
+            </p>
+
+            <p className="table-desc">
+              {item.desc.slice(0, 42)}…
+            </p>
+          </div>
+        </div>
+      </td>
+
+      <td>
+        <span className="table-cat">
+          {item.category}
+        </span>
+      </td>
+
+      <td>
+        <div className="action-btns">
+          <button
+            className="action-edit"
+            onClick={() => setEditing(item)}
+          >
+            ✏️ Edit
+          </button>
+
+          <button
+            className="action-del"
+            onClick={() => setDeleteId(item.id)}
+          >
+            🗑️
+          </button>
+        </div>
+      </td>
+    </tr>
+  ))}
+</tbody>
             </table>
             {filtered.length === 0 && (
               <div className="table-empty">No items found matching your filters.</div>
@@ -425,8 +446,18 @@ const styles = `
   .cat-chip:hover { border-color:#e8773a44; color:#f5ede0; }
   .cat-chip.active { background:#e8773a; border-color:#e8773a; color:#fff; }
 
-  .table-wrap { background:#1a1610; border:1px solid #2e2820; border-radius:18px; overflow:hidden; }
-  .menu-table { width:100%; border-collapse:collapse; }
+  .table-wrap {
+  background:#1a1610;
+  border:1px solid #2e2820;
+  border-radius:18px;
+  overflow-x:auto;
+  width:100%;
+}
+  .menu-table {
+  width:100%;
+  border-collapse:collapse;
+  min-width:600px;
+}
   .menu-table thead tr { border-bottom:1px solid #2e2820; }
   .menu-table th { padding:14px 18px; text-align:left; font-size:0.7rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:#4a3c2c; }
   .table-row { border-bottom:1px solid #1e1c18; animation:rowIn 0.35s ease both; transition:background 0.15s; }
@@ -445,7 +476,12 @@ const styles = `
   .table-tag { background:#e8773a22; color:#e8773a; font-size:0.7rem; font-weight:700; padding:3px 10px; border-radius:20px; letter-spacing:0.04em; }
   .table-notag { color:#3a3228; font-size:0.8rem; }
 
-  .action-btns { display:flex; gap:8px; align-items:center; }
+  .action-btns {
+  display:flex;
+  gap:8px;
+  align-items:center;
+  flex-wrap:wrap;
+}
   .action-edit { background:none; border:1.5px solid #2e2820; color:#b89a70; font-family:'DM Sans',sans-serif; font-size:0.78rem; font-weight:600; padding:7px 14px; border-radius:8px; cursor:pointer; transition:all 0.2s; }
   .action-edit:hover { border-color:#e8773a; color:#e8773a; background:#e8773a12; }
   .action-del { background:none; border:1.5px solid #2e2820; color:#4a3c2c; font-size:0.9rem; padding:7px 10px; border-radius:8px; cursor:pointer; transition:all 0.2s; }
@@ -480,4 +516,26 @@ const styles = `
     .stats-row { grid-template-columns:repeat(2,1fr); }
     .admin-main { padding:20px; }
   }
+    .menu-table th,
+.menu-table td {
+  padding:12px;
+}
+
+.table-name {
+  font-size:0.82rem;
+}
+
+.table-desc {
+  font-size:0.68rem;
+}
+
+.action-edit,
+.action-del {
+  width:100%;
+  justify-content:center;
+}
+
+.item-cell {
+  min-width:220px;
+}
 `;
