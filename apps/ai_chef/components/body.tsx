@@ -3,76 +3,355 @@ import gsap from 'gsap'
 import { useGSAP } from '@gsap/react'
 import { useRef } from 'react'
 import { useRouter } from 'next/navigation'
+
 export default function Mainbody() {
-  const dumplingRef = useRef(null);
-  const Router=useRouter();
-  const spiceref=useRef(null)
+  const containerRef = useRef(null)
+  const heroImgRef = useRef(null)
+  const spiceRef = useRef(null)
+  const headlineRef = useRef(null)
+  const subRef = useRef(null)
+  const ctaRef = useRef(null)
+  const navRef = useRef(null)
+  const tomatoRef = useRef(null)
+  const Router = useRouter()
+
   useGSAP(() => {
-    gsap.fromTo(
-      dumplingRef.current,
-      {xPercent: 100, autoAlpha: 0    }, 
-      {xPercent: 0, autoAlpha: 1, duration: 1,ease: "power1.out"}
-    );
-    gsap.fromTo(
-      spiceref.current,
-      {xPercent:-100,autoAlpha:0},
-      {xPercent:0,autoAlpha:1,duration:1,ease:"power1.out"}
+    const tl = gsap.timeline({ defaults: { ease: 'power3.out' } })
+
+    tl.fromTo(
+      navRef.current,
+      { autoAlpha: 0, y: -16 },
+      { autoAlpha: 1, y: 0, duration: 0.7 }
     )
-  }, []);
+      .fromTo(
+        headlineRef.current,
+        { autoAlpha: 0, y: 40 },
+        { autoAlpha: 1, y: 0, duration: 0.8 },
+        '-=0.2'
+      )
+      .fromTo(
+        [subRef.current, ctaRef.current],
+        { autoAlpha: 0, y: 24 },
+        {
+          autoAlpha: 1,
+          y: 0,
+          duration: 0.7,
+          stagger: 0.12,
+        },
+        '-=0.4'
+      )
+      .fromTo(
+        heroImgRef.current,
+        { autoAlpha: 0, x: 60, scale: 0.94 },
+        {
+          autoAlpha: 1,
+          x: 0,
+          scale: 1,
+          duration: 1,
+        },
+        '-=0.9'
+      )
+      .fromTo(
+        [spiceRef.current, tomatoRef.current],
+        { autoAlpha: 0, scale: 0.85 },
+        {
+          autoAlpha: 1,
+          scale: 1,
+          duration: 0.9,
+          stagger: 0.15,
+        },
+        '-=0.5'
+      )
+  }, [])
 
   return (
-    <div className="relative h-screen w-full overflow-x-hidden">
-      {/* Navigation Bar */}
-      <div className="absolute top-6 left-10 flex items-center gap-8 z-20">
-        <span className="text-lg font-bold">luscious</span>
-      </div>
-      <div className="absolute top-6 right-12 flex items-center gap-8 z-20">
-        <a href="#" className="text-base text-gray-700 hover:text-[#ff7a27] font-medium">AI recipes</a>
-        <a href="/recipelist" className="text-base text-gray-700 hover:text-[#ff7a27] font-medium">Recipes</a>
-        <a href="#" className="text-base text-gray-700 hover:text-[#ff7a27] font-medium">About</a>
-        <a href="#" className="text-base text-gray-700 hover:text-[#ff7a27] font-medium">Contact</a>
-        <button className="ml-3 px-6 py-2 border-2 border-[#ff7a27] text-[#ff7a27] rounded-full font-semibold hover:bg-[#ff7a27] hover:text-white transition cursor-pointer" onClick={()=>{Router.push("/signin")}}>Login</button>
-      </div>
+    <div
+      ref={containerRef}
+      className="relative h-screen w-full overflow-hidden bg-[#faf8f4]"
+      style={{
+        fontFamily:
+          "'Cormorant Garamond', Georgia, serif",
+      }}
+    >
+      <div
+        className="absolute inset-0 pointer-events-none z-0"
+        style={{
+          background:
+            'radial-gradient(ellipse at 70% 50%, #fff3e820 0%, transparent 70%)',
+        }}
+      />
 
-      {/* Top-Left Spices */}
-      <img src="/spices.png" alt="Spices" ref={spiceref} className="absolute left-10 top-20 w-44 z-10 pointer-events-none" />
-      {/* Top-Right Tomatoes */}
-      <img src="/tomato-vine.png" alt="Tomatoes" className="absolute right-10 top-24 w-24 z-10 pointer-events-none" />
-      {/* Bottom-Left Sauce Bowl */}
-      <img src="/sauce-bowl.png" alt="Sauce Bowl" className="absolute left-24 bottom-9 w-32 z-10 pointer-events-none" />
+      {/* Nav */}
+      <nav
+        ref={navRef}
+        className="absolute top-0 left-0 right-0 flex items-center justify-between px-10 py-6 z-30"
+      >
+        <span
+          style={{
+            fontFamily:
+              "'Cormorant Garamond', serif",
+            fontSize: '1.4rem',
+            fontWeight: 600,
+            letterSpacing: '0.04em',
+          }}
+        >
+          luscious
+        </span>
 
-      {/* Content Layout */}
-      <div className="grid grid-cols-12 h-full w-full max-w-6xl mx-auto pt-36 pb-16 px-4 sm:px-8">
-        {/* Left text content */}
-        <div className="flex flex-col justify-center max-w-[430px] w-full col-span-7">
-          <h2 className="text-5xl font-bold leading-tight mb-5">
-            Take a taste<br />
-            Come join us.
-          </h2>
-          <p className="text-lg text-gray-700 mb-2 font-medium">
-            Life is so endlessly delicious.
-          </p>
-          <p className="text-xs text-gray-400 max-w-xs mb-7">
-            Dumpling is a broad classification for a dish that consists of pieces of dough made from a variety of starch sources wrapped around a filling, or of dough with no filling.
-          </p>
-          <button className="ml-3 px-6 py-2 border-2 border-[#ff7a27] text-[#ff7a27] rounded-full font-semibold hover:bg-[#ff7a27] hover:text-white transition cursor-pointer w-50" 
-          onClick={()=>{Router.push("/menu")}}
+        <div className="flex items-center gap-8">
+          {[
+            'Menu',
+            'Orders',
+            'About',
+            'Contact',
+          ].map((link) => (
+            <a
+              key={link}
+              href="#"
+              style={{
+                fontSize: '0.85rem',
+                letterSpacing: '0.06em',
+                color: '#555',
+                textDecoration: 'none',
+                fontFamily:
+                  "'DM Sans', sans-serif",
+              }}
+              className="hover:text-black transition-colors duration-200"
+            >
+              {link.toUpperCase()}
+            </a>
+          ))}
+
+          <button
+            onClick={() => Router.push('/signin')}
+            style={{
+              fontSize: '0.8rem',
+              letterSpacing: '0.08em',
+              padding: '8px 22px',
+              border: '1px solid #d4a96a',
+              borderRadius: '100px',
+              background: 'transparent',
+              color: '#d4a96a',
+              cursor: 'pointer',
+              fontFamily:
+                "'DM Sans', sans-serif",
+            }}
           >
-            Explore Now
+            LOGIN
           </button>
         </div>
+      </nav>
 
-        {/* Dumpling image + Chopsticks */}
-        <div className="relative flex items-center justify-center  col-span-5">
-          <img
-            ref={dumplingRef}
-            src="/momo.png"
-            alt="Dumplings on Plate"
-            className="w-[540px] z-20"
+      <div className="grid grid-cols-12 h-full max-w-6xl mx-auto px-10 items-center pt-16">
+
+        {/* Left */}
+        <div className="col-span-5 flex flex-col justify-center gap-5">
+          <p
+            ref={subRef}
+            style={{
+              fontSize: '0.75rem',
+              letterSpacing: '0.16em',
+              color: '#d4a96a',
+              fontFamily:
+                "'DM Sans', sans-serif",
+            }}
+          >
+            PREMIUM DINING EXPERIENCE
+          </p>
+
+          <h1
+            ref={headlineRef}
+            style={{
+              fontSize:
+                'clamp(2.8rem, 4vw, 4.2rem)',
+              lineHeight: 1.08,
+              fontWeight: 500,
+              color: '#1a1a18',
+              margin: 0,
+            }}
+          >
+            Fresh flavours,
+            <br />
+            <em
+              style={{
+                fontStyle: 'italic',
+                color: '#8c6d45',
+              }}
+            >
+              delivered fast.
+            </em>
+          </h1>
+
+          <p
+            style={{
+              fontSize: '0.95rem',
+              color: '#777',
+              lineHeight: 1.75,
+              maxWidth: '340px',
+              margin: 0,
+              fontFamily:
+                "'DM Sans', sans-serif",
+              fontWeight: 300,
+            }}
+          >
+            Order restaurant-quality biryanis,
+            burgers, noodles, desserts and
+            refreshing drinks directly from your
+            phone.
+          </p>
+
+          <div
+            ref={ctaRef}
+            className="flex items-center gap-4 mt-2"
+          >
+            <button
+              onClick={() => Router.push('/menu')}
+              style={{
+                fontSize: '0.8rem',
+                letterSpacing: '0.1em',
+                padding: '12px 28px',
+                background: '#1a1a18',
+                color: '#faf8f4',
+                border: 'none',
+                borderRadius: '100px',
+                cursor: 'pointer',
+                fontFamily:
+                  "'DM Sans', sans-serif",
+              }}
+            >
+              EXPLORE MENU
+            </button>
+
+            <span
+              style={{
+                fontSize: '0.8rem',
+                color: '#aaa',
+                letterSpacing: '0.06em',
+                fontFamily:
+                  "'DM Sans', sans-serif",
+              }}
+            >
+              50+ signature dishes
+            </span>
+          </div>
+        </div>
+
+        {/* Hero */}
+        <div
+          className="col-span-4 flex items-center justify-center relative"
+          style={{ height: '72vh' }}
+        >
+          <div
+            style={{
+              position: 'absolute',
+              width: '420px',
+              height: '420px',
+              borderRadius: '50%',
+              background: '#f0e6d3',
+              top: '50%',
+              left: '50%',
+              transform:
+                'translate(-50%, -50%)',
+            }}
           />
 
+          <img
+            ref={heroImgRef}
+            src="./momo.png"
+            alt="Restaurant Food"
+            style={{
+              width: '440px',
+              maxWidth: '100%',
+              position: 'relative',
+              zIndex: 2,
+              borderRadius: '24px',
+              objectFit: 'cover',
+            }}
+          />
+        </div>
+
+        {/* Right */}
+        <div className="col-span-3 flex flex-col items-start justify-center gap-8 pl-4">
+          <img
+            ref={tomatoRef}
+            src="https://images.unsplash.com/photo-1547592180-85f173990554?q=80&w=400&auto=format&fit=crop"
+            alt="Food"
+            style={{
+              width: '72px',
+              opacity: 0.85,
+              borderRadius: '12px',
+            }}
+          />
+
+          <div
+            style={{
+              borderLeft: '2px solid #d4a96a',
+              paddingLeft: '16px',
+            }}
+          >
+            <p
+              style={{
+                fontSize: '2rem',
+                fontWeight: 500,
+                color: '#1a1a18',
+                margin: 0,
+              }}
+            >
+              4.9
+            </p>
+
+            <p
+              style={{
+                fontSize: '0.75rem',
+                color: '#aaa',
+              }}
+            >
+              CUSTOMER RATING
+            </p>
+          </div>
+
+          <div
+            style={{
+              borderLeft: '2px solid #e8ddd0',
+              paddingLeft: '16px',
+            }}
+          >
+            <p
+              style={{
+                fontSize: '2rem',
+                fontWeight: 500,
+                color: '#1a1a18',
+                margin: 0,
+              }}
+            >
+              12k+
+            </p>
+
+            <p
+              style={{
+                fontSize: '0.75rem',
+                color: '#aaa',
+              }}
+            >
+              ORDERS DELIVERED
+            </p>
+          </div>
         </div>
       </div>
+
+      <img
+        ref={spiceRef}
+        src="https://images.unsplash.com/photo-1515003197210-e0cd71810b5f?q=80&w=400&auto=format&fit=crop"
+        alt="Spices"
+        style={{
+          position: 'absolute',
+          left: '3%',
+          bottom: '8%',
+          width: '90px',
+          opacity: 0.55,
+          borderRadius: '14px',
+        }}
+      />
     </div>
-  );
+  )
 }

@@ -1,195 +1,282 @@
 'use client'
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { useGSAP } from "@gsap/react";
-import { useRef, useState } from "react";
 
-gsap.registerPlugin(ScrollTrigger);
+import gsap from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { useGSAP } from '@gsap/react'
+import { useRef, useState, useEffect } from 'react'
+
+gsap.registerPlugin(ScrollTrigger)
 
 export default function Menu() {
-  const containerRef = useRef(null);
-  const leftImgRef = useRef(null);
-  const rightImgRef = useRef(null);
-  const bottomImgRef = useRef(null);
+  const containerRef = useRef(null)
+  const headerRef = useRef(null)
+  const tabsRef = useRef(null)
 
-  // State to track active tab for underline
-  const [activeTab, setActiveTab] = useState("Main Dish");
+  const [activeTab, setActiveTab] = useState('Biryani')
 
-  // Store references to the animations to restart on click
-  const animationsRef = useRef([]);
+  const dishes = {
+    Starters: [
+      {
+        name: 'Chicken Popcorn',
+        desc: 'Crispy bite-sized chicken served with smoky garlic mayo.',
+        price: '₹199',
+      },
+      {
+        name: 'Loaded Fries',
+        desc: 'Cheesy peri-peri fries topped with jalapeños and herbs.',
+        price: '₹149',
+      },
+      {
+        name: 'Paneer Tikka',
+        desc: 'Char-grilled paneer cubes marinated in house spices.',
+        price: '₹229',
+      },
+    ],
+
+    Biryani: [
+      {
+        name: 'Chicken Dum Biryani',
+        desc: 'Slow-cooked fragrant basmati rice layered with tender chicken and aromatic spices.',
+        price: '₹299',
+      },
+      {
+        name: 'Mutton Biryani',
+        desc: 'Rich and flavourful mutton biryani finished with saffron and fried onions.',
+        price: '₹399',
+      },
+      {
+        name: 'Veg Hyderabadi Biryani',
+        desc: 'Garden vegetables cooked with royal spices and long-grain rice.',
+        price: '₹249',
+      },
+    ],
+
+    Drinks: [
+      {
+        name: 'Virgin Mojito',
+        desc: 'Fresh mint, lime and sparkling soda served ice cold.',
+        price: '₹119',
+      },
+      {
+        name: 'Watermelon Cooler',
+        desc: 'Refreshing watermelon blend with citrus and basil.',
+        price: '₹139',
+      },
+      {
+        name: 'Cold Coffee',
+        desc: 'Creamy chilled coffee topped with chocolate drizzle.',
+        price: '₹159',
+      },
+    ],
+  }
+
+  const cardRefs = useRef([])
+
+  const currentDishes = dishes[activeTab]
 
   useGSAP(() => {
-    const animations = [];
-
-    // Animate images: rotate only
-    const images = gsap.utils.toArray("img.rounded-full");
-    images.forEach((img) => {
-      const anim = gsap.to(img, {
-        rotate: 45,
-        duration: 1,
-        ease: "power2.out",
-        paused: true,
-      });
-      animations.push(anim);
-    });
-
-    // Animate all text: fade in and move up
-    const texts = gsap.utils.toArray(".text > h3, .text > p, h2, p, .flex.mb-10");
-    texts.forEach((txt) => {
-      const anim = gsap.fromTo(
-        txt,
-        { opacity: 0, y: 50 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 1,
-          ease: "power2.out",
-          delay: 0.3,
-          paused: true,
-        }
-      );
-      animations.push(anim);
-    });
-
-    // Animate left ingredient image: slide in/out on scroll
-    const leftAnim = gsap.fromTo(
-      leftImgRef.current,
-      { x: "-150%" },
+    gsap.fromTo(
+      [headerRef.current, tabsRef.current],
       {
-        x: "0%",
-        duration: 1,
-        ease: "power2.out",
-        paused: true,
-      }
-    );
-    animations.push(leftAnim);
-
-    // Animate right ingredient image: slide in/out on scroll
-    const rightAnim = gsap.fromTo(
-      rightImgRef.current,
-      { x: "150%" },
+        autoAlpha: 0,
+        y: 24,
+      },
       {
-        x: "0%",
-        duration: 1,
-        ease: "power2.out",
-        paused: true,
+        autoAlpha: 1,
+        y: 0,
+        duration: 0.8,
+        stagger: 0.15,
+        ease: 'power3.out',
+        scrollTrigger: {
+          trigger: containerRef.current,
+          start: 'top 80%',
+        },
       }
-    );
-    animations.push(rightAnim);
+    )
+  }, [])
 
-    // Animate bottom ingredient (optional): slide up from bottom
-    const bottomAnim = gsap.fromTo(
-      bottomImgRef.current,
-      { y: "150%" },
+  useEffect(() => {
+    gsap.fromTo(
+      cardRefs.current,
       {
-        y: "0%",
-        duration: 1,
-        ease: "power2.out",
-        paused: true,
+        autoAlpha: 0,
+        y: 30,
+      },
+      {
+        autoAlpha: 1,
+        y: 0,
+        duration: 0.6,
+        stagger: 0.08,
+        ease: 'power3.out',
       }
-    );
-    animations.push(bottomAnim);
-
-    animationsRef.current = animations;
-
-    // On initial load: play all animations
-    animations.forEach((anim) => anim.play());
-  }, []);
-
-  // Handler to restart all animations and update active tab
-  function handleTabClick(tabName) {
-    setActiveTab(tabName);
-    if (!animationsRef.current) return;
-    animationsRef.current.forEach((anim) => {
-      anim.restart();
-    });
-  }
+    )
+  }, [activeTab])
 
   return (
     <div
       ref={containerRef}
-      className="relative flex flex-col items-center w-screen min-h-screen bg-[url('/marble-bg.jpg')] bg-cover py-12"
+      style={{
+        background: '#1a1a18',
+        minHeight: '100vh',
+        padding: '80px 24px',
+        fontFamily: "'DM Sans', sans-serif",
+      }}
     >
-      {/* Section Header */}
-      <h2 className="text-3xl font-bold mb-2">What's on our Plate</h2>
-      <p className="mb-6 text-gray-600 text-center">Please serve yourself without any hesitate</p>
-
-      {/* Tabs with active underline */}
-      <div className="flex mb-10 justify-center">
-        {["Appetizers", "Main Dish", "Dessert"].map((tab) => (
-          <button
-            key={tab}
-            onClick={() => handleTabClick(tab)}
-            className={`mx-2 px-4 py-2 font-medium ${
-              activeTab === tab
-                ? "text-black border-b-2 border-orange-400 font-bold"
-                : "text-gray-500"
-            } cursor-pointer`}
+      <div
+        style={{
+          maxWidth: '860px',
+          margin: '0 auto',
+        }}
+      >
+        <div ref={headerRef} style={{ marginBottom: '56px' }}>
+          <p
+            style={{
+              fontSize: '0.72rem',
+              letterSpacing: '0.18em',
+              color: '#d4a96a',
+              marginBottom: '12px',
+            }}
           >
-            {tab}
-          </button>
-        ))}
-      </div>
+            POPULAR DISHES
+          </p>
 
-      {/* Dishes */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-12 w-full max-w-4xl">
-        {/* Stirred Egg */}
-        <div className="text flex flex-col items-center">
-          <img
-            src="./pulao-removebg-preview.png"
-            alt="Stirred Egg"
-            className="rounded-full w-48 h-48 object-cover mb-4 shadow-lg"
-          />
-          <h3 className="font-bold text-xl mb-2">Stirred Egg</h3>
-          <p className="text-gray-500 text-center max-w-xs mb-2">
-            This might be the most common Chinese family dish. The dish is easy to cook, fry the stirred egg and sliced tomato.
-          </p>
+          <h2
+            style={{
+              fontFamily:
+                "'Cormorant Garamond', serif",
+              fontSize: 'clamp(2.4rem, 4vw, 3.6rem)',
+              fontWeight: 400,
+              color: '#faf8f4',
+              margin: 0,
+              lineHeight: 1.1,
+            }}
+          >
+            Freshly made
+            <br />
+            <em>every single day</em>
+          </h2>
         </div>
-        {/* Kung Pao Chicken */}
-        <div className="text flex flex-col items-center">
-          <img
-            src="./pulao-removebg-preview.png"
-            alt="Kung Pao Chicken"
-            className="rounded-full w-48 h-48 object-cover mb-4 shadow-lg"
-          />
-          <h3 className="font-bold text-xl mb-2">Kung Pao Chicken</h3>
-          <p className="text-gray-500 text-center max-w-xs mb-2">
-            When temperatures plummet and you're craving something warm and cozy, you can't go wrong with fluffy.
-          </p>
-        </div>
-        {/* Sweet Pork Chops */}
-        <div className="text flex flex-col items-center">
-          <img
-            src="./pulao-removebg-preview.png"
-            alt="Sweet Pork Chops"
-            className="rounded-full w-48 h-48 object-cover mb-4 shadow-lg"
-          />
-          <h3 className="font-bold text-xl mb-2">Sweet Pork Chops</h3>
-          <p className="text-gray-500 text-center max-w-xs mb-2">
-            Sweet and sour dishes are popular among Chinese families. Although the ingredients and cooking methods...
-          </p>
-        </div>
-      </div>
 
-      {/* Decorative ingredient images */}
-      <img
-        ref={rightImgRef}
-        src="./live-pink-crayfish-removebg-preview.png"
-        alt="lobster"
-        className="absolute top-0 right-24 w-32 hidden md:block"
-      />
-      <img
-        ref={leftImgRef}
-        src="./live-pink-crayfish-removebg-preview.png"
-        alt="peas"
-        className="absolute top-0 left-24 w-24 hidden md:block"
-      />
-      <img
-        ref={bottomImgRef}
-        src="./live-pink-crayfish-removebg-preview.png"
-        alt="garlic"
-        className="absolute bottom-0 left-40 w-20 hidden md:block"
-      />
+        <div
+          ref={tabsRef}
+          style={{
+            display: 'flex',
+            marginBottom: '48px',
+            borderBottom: '1px solid #2e2e2a',
+          }}
+        >
+          {Object.keys(dishes).map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              style={{
+                background: 'none',
+                border: 'none',
+                borderBottom:
+                  activeTab === tab
+                    ? '2px solid #d4a96a'
+                    : '2px solid transparent',
+                padding: '12px 24px',
+                fontSize: '0.8rem',
+                letterSpacing: '0.1em',
+                color:
+                  activeTab === tab
+                    ? '#d4a96a'
+                    : '#666',
+                cursor: 'pointer',
+              }}
+            >
+              {tab.toUpperCase()}
+            </button>
+          ))}
+        </div>
+
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '1px',
+            background: '#2a2a27',
+          }}
+        >
+          {currentDishes.map((dish, i) => (
+            <div
+              key={dish.name}
+              ref={(el) => {
+                cardRefs.current[i] = el
+              }}
+              style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr auto',
+                alignItems: 'center',
+                gap: '24px',
+                padding: '28px 32px',
+                background: '#1a1a18',
+                border: '1px solid #2a2a27',
+              }}
+            >
+              <div>
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'baseline',
+                    gap: '12px',
+                    marginBottom: '8px',
+                  }}
+                >
+                  <span
+                    style={{
+                      fontFamily:
+                        "'Cormorant Garamond', serif",
+                      fontSize: '1.3rem',
+                      fontWeight: 500,
+                      color: '#faf8f4',
+                    }}
+                  >
+                    {dish.name}
+                  </span>
+                </div>
+
+                <p
+                  style={{
+                    fontSize: '0.85rem',
+                    color: '#666',
+                    lineHeight: 1.65,
+                    margin: 0,
+                    maxWidth: '520px',
+                    fontWeight: 300,
+                  }}
+                >
+                  {dish.desc}
+                </p>
+              </div>
+
+              <span
+                style={{
+                  fontFamily:
+                    "'Cormorant Garamond', serif",
+                  fontSize: '1.1rem',
+                  color: '#d4a96a',
+                }}
+              >
+                {dish.price}
+              </span>
+            </div>
+          ))}
+        </div>
+
+        <p
+          style={{
+            fontSize: '0.75rem',
+            color: '#444',
+            marginTop: '32px',
+          }}
+        >
+          Order directly from your table or phone
+          — fast service, live kitchen updates and
+          fresh meals guaranteed.
+        </p>
+      </div>
     </div>
-  );
+  )
 }

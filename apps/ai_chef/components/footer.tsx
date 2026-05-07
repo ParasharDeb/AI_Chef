@@ -1,112 +1,182 @@
 'use client'
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { useGSAP } from "@gsap/react";
-import { useRef } from "react";
+import gsap from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { useGSAP } from '@gsap/react'
+import { useRef } from 'react'
 
-gsap.registerPlugin(ScrollTrigger);
+gsap.registerPlugin(ScrollTrigger)
+
+const footerLinks = {
+  'Get Cooking': ['Easy Asian Takeout', 'Recipe Gallery', 'Ingredients Guide', 'Weekly Meal Plans', 'Conversion Tool'],
+  'Information': ['About', 'Privacy Policy', 'Disclosure', 'Contact'],
+  'Follow Us': ['Instagram', 'Youtube', 'Pinterest', 'Facebook'],
+}
 
 export default function Footer() {
-  const footerRef = useRef(null);
-  const decorImgRefs = [useRef(null), useRef(null), useRef(null), useRef(null), useRef(null), useRef(null), useRef(null), useRef(null)];
+  const footerRef = useRef(null)
+  const emailSectionRef = useRef(null)
+  const linksRef = useRef(null)
+  const accentImgRefs = useRef<(HTMLImageElement | null)[]>([])
 
   useGSAP(() => {
-    // Animate each decorative image: fade in and pop up when scrolled to Footer
-    decorImgRefs.forEach((imgRef, idx) => {
-      gsap.fromTo(
-        imgRef.current,
-        { opacity: 0, y: 50, scale: 0.8 },
-        {
-          opacity: 1,
-          y: 0,
-          scale: 1,
-          duration: 1,
-          ease: "power2.out",
-          delay: idx * 0.13,
-          scrollTrigger: {
-            trigger: footerRef.current,
-            start: "top 90%",    // trigger only when footer comes into view
-            toggleActions: "play reverse play reverse",
-          }
-        }
-      );
-    });
-  }, []);
+    gsap.fromTo(
+      emailSectionRef.current,
+      { autoAlpha: 0, y: 32 },
+      {
+        autoAlpha: 1, y: 0, duration: 0.9, ease: 'power3.out',
+        scrollTrigger: { trigger: footerRef.current, start: 'top 85%' }
+      }
+    )
+    gsap.fromTo(
+      linksRef.current,
+      { autoAlpha: 0, y: 20 },
+      {
+        autoAlpha: 1, y: 0, duration: 0.7, ease: 'power3.out', delay: 0.2,
+        scrollTrigger: { trigger: footerRef.current, start: 'top 85%' }
+      }
+    )
+    // Subtle accent images — only 2, small
+    gsap.fromTo(
+      accentImgRefs.current.filter(Boolean),
+      { autoAlpha: 0, scale: 0.8 },
+      {
+        autoAlpha: 1, scale: 1, duration: 1, stagger: 0.2, ease: 'power3.out',
+        scrollTrigger: { trigger: footerRef.current, start: 'top 85%' }
+      }
+    )
+  }, [])
 
   return (
-    <div
+    <footer
       ref={footerRef}
-      className="relative bg-[url('/marble-bg.jpg')] bg-cover min-h-[430px] w-full pt-16 pb-12 px-4 sm:px-16"
+      style={{
+        background: '#1a1a18',
+        padding: '72px 40px 40px',
+        position: 'relative',
+        overflow: 'hidden',
+        fontFamily: "'DM Sans', sans-serif",
+      }}
     >
-      {/* Top decorative images */}
-      <img ref={decorImgRefs[0]} src="/spinach.png" alt="spinach" className="absolute left-8 top-10 w-24" />
-      <img ref={decorImgRefs[1]} src="/onion.png" alt="onion" className="absolute left-[225px] top-5 w-14" />
-      <img ref={decorImgRefs[2]} src="/parsley.png" alt="parsley" className="absolute left-1/2 top-8 w-16" />
-      <img ref={decorImgRefs[3]} src="/lemon-slice.png" alt="lemon" className="absolute right-48 top-12 w-14" />
-      <img ref={decorImgRefs[4]} src="/frying-pan.png" alt="pan" className="absolute right-10 top-8 w-36" />
-      <img ref={decorImgRefs[5]} src="/chili.png" alt="chili" className="absolute right-40 top-[98px] w-8" />
-      <img ref={decorImgRefs[6]} src="/tomato.png" alt="tomato" className="absolute left-[190px] top-24 w-14" />
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&display=swap');
+        .footer-link { color: #555; font-size: 0.85rem; text-decoration: none; transition: color 0.2s ease; line-height: 2.1; display: block; }
+        .footer-link:hover { color: #d4a96a; }
+      `}</style>
 
-      <div className="flex flex-col items-center justify-center text-center mt-6 mb-16">
-        <h2 className="text-2xl sm:text-3xl font-bold mb-3">Easy recipes will send to your inbox</h2>
-        <p className="text-gray-500 mb-5 text-[18px] max-w-md">
-          Get weekly updates on the newest chinese recipes in your mailbox!
-        </p>
-        <div className="flex flex-row justify-center items-center gap-2 mt-2 max-w-xl w-full">
-          <input
-            className="bg-white px-7 py-3 rounded-xl max-w-sm w-full text-gray-700 border outline-none shadow"
-            placeholder="your email address"
-            type="email"
-          />
-          <button className="bg-[#ff7a27] rounded-xl px-8 py-3 text-white font-bold text-lg shadow hover:bg-[#ff974f] transition">
-            subscribe
-          </button>
+      {/* Subtle decorative images — 2 max, small and tasteful */}
+      <img
+        ref={el => { accentImgRefs.current[0] = el }}
+        src="/star-anise.png"
+        alt=""
+        aria-hidden="true"
+        style={{ position: 'absolute', top: '40px', right: '60px', width: '52px', opacity: 0.18 }}
+      />
+      <img
+        ref={el => { accentImgRefs.current[1] = el }}
+        src="/chili.png"
+        alt=""
+        aria-hidden="true"
+        style={{ position: 'absolute', bottom: '80px', left: '40px', width: '36px', opacity: 0.15, transform: 'rotate(-20deg)' }}
+      />
+
+      <div style={{ maxWidth: '900px', margin: '0 auto' }}>
+
+        {/* Email signup */}
+        <div
+          ref={emailSectionRef}
+          style={{
+            borderBottom: '1px solid #2a2a27',
+            paddingBottom: '56px',
+            marginBottom: '48px',
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr',
+            gap: '40px',
+            alignItems: 'center',
+          }}
+        >
+          <div>
+            <h2 style={{
+              fontFamily: "'Cormorant Garamond', serif",
+              fontSize: 'clamp(1.8rem, 2.5vw, 2.4rem)',
+              fontWeight: 400,
+              color: '#faf8f4',
+              margin: '0 0 10px',
+              lineHeight: 1.2,
+            }}>
+              Recipes, straight<br />to <em>your inbox</em>
+            </h2>
+            <p style={{ fontSize: '0.85rem', color: '#555', margin: 0, fontWeight: 300, lineHeight: 1.6 }}>
+              Weekly drops of the best Chinese home recipes.
+            </p>
+          </div>
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <input
+              type="email"
+              placeholder="your@email.com"
+              style={{
+                flex: 1,
+                padding: '12px 18px',
+                background: '#242420',
+                border: '1px solid #333',
+                borderRadius: '100px',
+                color: '#faf8f4',
+                fontSize: '0.85rem',
+                outline: 'none',
+                fontFamily: "'DM Sans', sans-serif",
+              }}
+            />
+            <button style={{
+              padding: '12px 22px',
+              background: '#d4a96a',
+              border: 'none',
+              borderRadius: '100px',
+              color: '#1a1a18',
+              fontSize: '0.78rem',
+              fontWeight: 500,
+              letterSpacing: '0.08em',
+              cursor: 'pointer',
+              whiteSpace: 'nowrap',
+              fontFamily: "'DM Sans', sans-serif",
+              transition: 'background 0.2s ease',
+            }}
+            onMouseEnter={e => { (e.target as HTMLButtonElement).style.background = '#c49355' }}
+            onMouseLeave={e => { (e.target as HTMLButtonElement).style.background = '#d4a96a' }}
+            >
+              SUBSCRIBE
+            </button>
+          </div>
+        </div>
+
+        {/* Links grid */}
+        <div ref={linksRef} style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '32px', marginBottom: '48px' }}>
+          {Object.entries(footerLinks).map(([heading, links]) => (
+            <div key={heading}>
+              <p style={{ fontSize: '0.72rem', letterSpacing: '0.16em', color: '#d4a96a', marginBottom: '12px' }}>
+                {heading.toUpperCase()}
+              </p>
+              <nav>
+                {links.map(link => (
+                  <a key={link} href="#" className="footer-link">{link}</a>
+                ))}
+              </nav>
+            </div>
+          ))}
+        </div>
+
+        {/* Bottom bar */}
+        <div style={{
+          borderTop: '1px solid #2a2a27',
+          paddingTop: '24px',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+        }}>
+          <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '1.1rem', color: '#faf8f4' }}>luscious</span>
+          <span style={{ fontSize: '0.75rem', color: '#3a3a36', letterSpacing: '0.04em' }}>
+            © 2025 Luscious. All rights reserved.
+          </span>
         </div>
       </div>
-
-      {/* Bottom decorative images */}
-      <img ref={decorImgRefs[7]} src="/star-anise.png" alt="star-anise" className="absolute left-1/2 top-[235px] w-10" />
-
-      <div className="flex flex-row flex-wrap justify-center gap-16 pt-16 pb-10 w-full max-w-5xl mx-auto">
-        <div>
-          <h3 className="font-semibold mb-3">Get Cooking</h3>
-          <ul className="text-gray-700 text-[15px]">
-            <li>Easy Asian Takeout</li>
-            <li>Recipe Gallery</li>
-            <li>Ingredients Guide</li>
-            <li>Weekly Meal Plans</li>
-            <li>Penang Tour</li>
-            <li>Conversion Tool</li>
-          </ul>
-        </div>
-        <div>
-          <h3 className="font-semibold mb-3">Infomation</h3>
-          <ul className="text-gray-700 text-[15px]">
-            <li>About</li>
-            <li>Disclosure</li>
-            <li>Privacy Policy</li>
-            <li>Giveaway Rules</li>
-            <li>Giveaway Winners</li>
-            <li>Contact</li>
-          </ul>
-        </div>
-        <div>
-          <h3 className="font-semibold mb-3">Follow Us</h3>
-          <ul className="text-gray-700 text-[15px]">
-            <li>RSS Feeds</li>
-            <li>Facebook</li>
-            <li>Instagram</li>
-            <li>Pinterest</li>
-            <li>Youtube</li>
-            <li>Twitter</li>
-          </ul>
-        </div>
-      </div>
-
-      {/* More decorative bottom images */}
-      <img src="/garlic.png" alt="garlic" className="absolute left-[220px] bottom-8 w-12" />
-      <img src="/pepper-seeds.png" alt="pepper-seeds" className="absolute left-[320px] bottom-12 w-6" />
-      <img src="/onion-slice.png" alt="onion-slice" className="absolute right-20 bottom-10 w-16" />
-    </div>
-  );
+    </footer>
+  )
 }
