@@ -55,7 +55,9 @@ export default function Mainbody() {
           <p className="text-xs text-gray-400 max-w-xs mb-7">
             Dumpling is a broad classification for a dish that consists of pieces of dough made from a variety of starch sources wrapped around a filling, or of dough with no filling.
           </p>
-          <button className="ml-3 px-6 py-2 border-2 border-[#ff7a27] text-[#ff7a27] rounded-full font-semibold hover:bg-[#ff7a27] hover:text-white transition cursor-pointer w-50">
+          <button className="ml-3 px-6 py-2 border-2 border-[#ff7a27] text-[#ff7a27] rounded-full font-semibold hover:bg-[#ff7a27] hover:text-white transition cursor-pointer w-50" 
+          onClick={()=>{Router.push("/menu")}}
+          >
             Explore Now
           </button>
         </div>
