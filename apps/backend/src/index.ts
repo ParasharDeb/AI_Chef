@@ -1,12 +1,47 @@
 import express from 'express'
-import { connectDB, adminModel, dishModel } from "../../database/dist/index.js"
+import { createServer } from 'http'
+import { Server } from 'socket.io'
+import { connectDB, adminModel, dishModel, cartModel, orderModel } from "../../database/dist/index.js"
 import bcryptjs from 'bcryptjs'
 import jwt from 'jsonwebtoken'
-
-const app=express();
+import Stripe from 'stripe'
+import cors from 'cors'
+const app = express();
+const httpServer = createServer(app);
+const io = new Server(httpServer, {
+    cors: {
+        origin: "*",
+        methods: ["GET", "POST"]
+    }
+});
+app.use(cors());
 app.use(express.json());
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key'
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_dummy')
+
+// Store connected clients for broadcasting updates
+const connectedClients: Map<string, string> = new Map(); // sessionId -> socketId
+
+// WebSocket connections
+io.on('connection', (socket: any) => {
+    console.log('Client connected:', socket.id);
+
+    socket.on('register_session', (sessionId: string) => {
+        connectedClients.set(sessionId, socket.id);
+        socket.join(`kitchen-${sessionId}`);
+        console.log(`Session ${sessionId} registered for real-time updates`);
+    });
+
+    socket.on('disconnect', () => {
+        connectedClients.forEach((socketId, sessionId) => {
+            if (socketId === socket.id) {
+                connectedClients.delete(sessionId);
+            }
+        });
+        console.log('Client disconnected:', socket.id);
+    });
+});
 
 // Middleware to verify JWT token
 const verifyToken = (req: any, res: any, next: any) => {
@@ -22,6 +57,8 @@ const verifyToken = (req: any, res: any, next: any) => {
         res.status(401).json({ error: 'Invalid token' });
     }
 };
+
+// ==================== AUTH ENDPOINTS ====================
 
 // Admin signup endpoint
 app.post("/admin/signup", async (req, res) => {
@@ -82,17 +119,18 @@ app.post("/admin", async (req, res) => {
     }
 });
 
+// ==================== MENU ENDPOINTS ====================
+
 // Add new item endpoint
 app.post("/newitem", verifyToken, async (req, res) => {
     try {
-        console.log("reached")
         await connectDB();
-        const { name, price, image, description ,category} = req.body;
+        const { name, price, image, description, category } = req.body;
 
         if (!name || !price || !image) {
             return res.status(400).json({ error: 'Name, price, and image are required' });
         }
-        console.log("reached 2")
+
         const newDish = new dishModel({
             name,
             price,
@@ -100,7 +138,7 @@ app.post("/newitem", verifyToken, async (req, res) => {
             category,
             description: description || ''
         });
-        console.log("raeched 3")
+
         await newDish.save();
         res.status(201).json({ message: 'Item added successfully', dish: newDish });
     } catch (error) {
@@ -146,53 +184,365 @@ app.get("/items", async (req, res) => {
     }
 });
 
-// Post image endpoint (placeholder for multer + cloudinary)
-app.post("/post-image", verifyToken, async (req, res) => {
+// ==================== CART ENDPOINTS ====================
+
+// Add item to cart endpoint
+app.post("/cart/add", async (req, res) => {
     try {
-        // TODO: Implement multer + cloudinary integration
-        // For now, returning a placeholder response
-        res.json({ message: 'Image upload endpoint - needs multer and cloudinary setup' });
+        await connectDB();
+        const { sessionId, dishId, quantity } = req.body;
+
+        if (!sessionId || !dishId || !quantity) {
+            return res.status(400).json({ error: 'sessionId, dishId, and quantity are required' });
+        }
+
+        // Get dish details
+        const dish = await dishModel.findById(dishId);
+        if (!dish) {
+            return res.status(404).json({ error: 'Dish not found' });
+        }
+
+        // Find or create cart
+        let cart = await cartModel.findOne({ sessionId });
+        
+        if (!cart) {
+            cart = new cartModel({
+                sessionId,
+                items: [{
+                    dishId,
+                    quantity,
+                    price: dish.price
+                }]
+            });
+        } else {
+            // Check if item already in cart
+            const existingItem = cart.items.find((item: any) => item.dishId.toString() === dishId);
+            if (existingItem) {
+                existingItem.quantity += quantity;
+            } else {
+                cart.items.push({
+                    dishId,
+                    quantity,
+                    price: dish.price
+                });
+            }
+        }
+
+        await cart.save();
+        res.status(200).json({ message: 'Item added to cart', cart });
     } catch (error) {
         res.status(500).json({ error: 'Server error' });
     }
 });
 
-// Calculate cart total endpoint
-app.post("/cart", (req, res) => {
+// Get cart endpoint
+app.get("/cart/:sessionId", async (req, res) => {
     try {
-        const { items } = req.body;
+        await connectDB();
+        const { sessionId } = req.params;
 
-        if (!items || !Array.isArray(items)) {
-            return res.status(400).json({ error: 'Items array is required' });
+        const cart = await cartModel.findOne({ sessionId }).populate('items.dishId');
+        
+        if (!cart) {
+            return res.status(200).json({
+                message: 'Cart is empty',
+                cart: { sessionId, items: [] },
+                items: [],
+                total: 0,
+            });
         }
 
-        const total = items.reduce((sum: number, item: any) => {
-            return sum + (item.price * item.quantity || 0);
+        const total = cart.items.reduce((sum: number, item: any) => {
+            return sum + (item.price * item.quantity);
         }, 0);
 
-        res.json({ total, items, message: 'Cart calculated' });
+        res.json({ cart, total });
     } catch (error) {
         res.status(500).json({ error: 'Server error' });
     }
 });
 
-// Payment endpoint (Google Pay)
-app.post("/payment", async (req, res) => {
+// Remove item from cart endpoint
+// Remove item from cart endpoint
+app.delete("/cart/remove", async (req, res) => {
     try {
-        const { amount, token } = req.body;
+        await connectDB();
 
-        if (!amount || !token) {
-            return res.status(400).json({ error: 'Amount and payment token required' });
+        const { sessionId, dishId } = req.body;
+
+        if (!sessionId || !dishId) {
+            return res.status(400).json({
+                error: "sessionId and dishId are required"
+            });
         }
 
-        // TODO: Integrate with Google Pay API
-        // For now, returning a placeholder response
-        res.json({ message: 'Payment processed successfully', amount, transactionId: 'TXN' + Date.now() });
+        const cart = await cartModel.findOne({ sessionId });
+
+        if (!cart) {
+            return res.status(404).json({
+                error: "Cart not found"
+            });
+        }
+
+        // Find item index
+        const index = cart.items.findIndex(
+            (item: any) =>
+                item.dishId.toString() === dishId
+        );
+
+        // Remove item safely from mongoose DocumentArray
+        if (index !== -1) {
+            cart.items.splice(index, 1);
+        }
+
+        // If cart becomes empty, delete it
+        if (cart.items.length === 0) {
+            await cartModel.deleteOne({ sessionId });
+
+            return res.json({
+                message: "Item removed, cart is now empty"
+            });
+        }
+
+        await cart.save();
+
+        res.json({
+            message: "Item removed from cart",
+            cart
+        });
+
+    } catch (error) {
+        console.error(error);
+
+        res.status(500).json({
+            error: "Server error"
+        });
+    }
+});
+
+// Clear cart endpoint
+app.delete("/cart/clear", async (req, res) => {
+    try {
+        await connectDB();
+        const { sessionId } = req.body;
+
+        if (!sessionId) {
+            return res.status(400).json({ error: 'sessionId is required' });
+        }
+
+        await cartModel.deleteOne({ sessionId });
+        res.json({ message: 'Cart cleared' });
     } catch (error) {
         res.status(500).json({ error: 'Server error' });
     }
 });
 
-app.listen(8080, () => {
-    console.log('Server running on port 8080');
-})
+// ==================== PAYMENT ENDPOINTS ====================
+
+// Create payment intent endpoint
+app.post("/payment/intent", async (req, res) => {
+    try {
+        await connectDB();
+        const { sessionId, amount } = req.body;
+
+        if (!sessionId || !amount) {
+            return res.status(400).json({ error: 'sessionId and amount are required' });
+        }
+
+        const paymentIntent = await stripe.paymentIntents.create({
+            amount: Math.round(amount * 100), // Convert to cents
+            currency: 'usd',
+            metadata: { sessionId }
+        });
+
+        res.json({
+            clientSecret: paymentIntent.client_secret,
+            paymentIntentId: paymentIntent.id
+        });
+    } catch (error) {
+        res.status(500).json({ error: 'Payment intent creation failed' });
+    }
+});
+
+// Verify payment webhook endpoint
+app.post("/webhook/payment", express.raw({ type: 'application/json' }), async (req, res) => {
+    try {
+        await connectDB();
+        const sig = req.headers['stripe-signature'] as string;
+        const event = stripe.webhooks.constructEvent(
+            req.body,
+            sig,
+            process.env.STRIPE_WEBHOOK_SECRET || 'whsec_dummy'
+        );
+
+        if (event.type === 'payment_intent.succeeded') {
+            const paymentIntent = event.data.object as any;
+            const sessionId = paymentIntent.metadata.sessionId;
+
+            // Get cart
+            const cart = await cartModel.findOne({ sessionId });
+            if (!cart) {
+                return res.status(404).json({ error: 'Cart not found' });
+            }
+
+            // Create order
+            const orderId = `ORD-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+            const order = new orderModel({
+                orderId,
+                sessionId,
+                items: cart.items.map((item: any) => ({
+                    dishId: item.dishId,
+                    dishName: item.dishName || `Dish ${item.dishId}`,
+                    quantity: item.quantity,
+                    price: item.price
+                })),
+                totalAmount: cart.items.reduce((sum: number, item: any) => sum + (item.price * item.quantity), 0),
+                paymentId: paymentIntent.id,
+                paymentStatus: 'completed',
+                status: 'confirmed'
+            });
+
+            await order.save();
+
+            // Clear cart
+            await cartModel.deleteOne({ sessionId });
+
+            // Send real-time update to kitchen
+            io.to(`kitchen-${sessionId}`).emit('new_order', {
+                orderId: order.orderId,
+                items: order.items,
+                totalAmount: order.totalAmount,
+                createdAt: order.createdAt
+            });
+
+            res.json({ message: 'Payment verified and order created', order });
+        }
+
+        res.json({ received: true });
+    } catch (error) {
+        console.error('Webhook error:', error);
+        res.status(400).json({ error: 'Webhook signature verification failed' });
+    }
+});
+
+// ==================== ORDER ENDPOINTS ====================
+
+// Get orders for session
+app.get("/orders/:sessionId", async (req, res) => {
+    try {
+        await connectDB();
+        const { sessionId } = req.params;
+
+        const orders = await orderModel.find({ sessionId }).sort({ createdAt: -1 });
+        res.json({ orders });
+    } catch (error) {
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
+// Get all orders (for admin kitchen dashboard)
+app.get("/orders", verifyToken, async (req, res) => {
+    try {
+        await connectDB();
+        const orders = await orderModel.find().sort({ createdAt: -1 });
+        res.json({ orders });
+    } catch (error) {
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
+// Update order status endpoint
+app.put("/orders/:orderId/status", verifyToken, async (req, res) => {
+    try {
+        await connectDB();
+        const { orderId } = req.params;
+        const { status } = req.body;
+
+        if (!['pending', 'confirmed', 'preparing', 'completed', 'cancelled'].includes(status)) {
+            return res.status(400).json({ error: 'Invalid status' });
+        }
+
+        const order = await orderModel.findByIdAndUpdate(
+            orderId,
+            { status, updatedAt: new Date() },
+            { new: true }
+        );
+
+        if (!order) {
+            return res.status(404).json({ error: 'Order not found' });
+        }
+
+        // Broadcast status update to all connected clients
+        io.emit('order_status_updated', {
+            orderId: order.orderId,
+            status: order.status,
+            updatedAt: order.updatedAt
+        });
+
+        res.json({ message: 'Order status updated', order });
+    } catch (error) {
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
+// Mark order as preparing
+app.put("/orders/:orderId/preparing", verifyToken, async (req, res) => {
+    try {
+        await connectDB();
+        const { orderId } = req.params;
+
+        const order = await orderModel.findByIdAndUpdate(
+            orderId,
+            { status: 'preparing', updatedAt: new Date() },
+            { new: true }
+        );
+
+        if (!order) {
+            return res.status(404).json({ error: 'Order not found' });
+        }
+
+        // Broadcast status update
+        io.emit('order_status_updated', {
+            orderId: order.orderId,
+            status: 'preparing',
+            updatedAt: order.updatedAt
+        });
+
+        res.json({ message: 'Order marked as preparing', order });
+    } catch (error) {
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
+// Mark order as completed
+app.put("/orders/:orderId/complete", verifyToken, async (req, res) => {
+    try {
+        await connectDB();
+        const { orderId } = req.params;
+
+        const order = await orderModel.findByIdAndUpdate(
+            orderId,
+            { status: 'completed', updatedAt: new Date() },
+            { new: true }
+        );
+
+        if (!order) {
+            return res.status(404).json({ error: 'Order not found' });
+        }
+
+        // Broadcast status update
+        io.emit('order_status_updated', {
+            orderId: order.orderId,
+            status: 'completed',
+            updatedAt: order.updatedAt
+        });
+
+        res.json({ message: 'Order completed', order });
+    } catch (error) {
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
+httpServer.listen(8080, () => {
+    console.log('Server running on port 8080 with WebSocket support');
+});
