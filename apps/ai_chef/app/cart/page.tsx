@@ -13,6 +13,7 @@ export default function CartPage() {
     loading,
     removeFromCart,
     clearCart,
+    createOrder,
   } = useCart(sessionId);
 
   const [placed, setPlaced] =
@@ -20,6 +21,8 @@ export default function CartPage() {
 
   const [error, setError] =
     useState("");
+
+  const [orderLoading, setOrderLoading] = useState(false);
 
   const TAX_RATE = 0.05;
   const DELIVERY = 49;
@@ -43,7 +46,7 @@ export default function CartPage() {
     };
 
   const handlePlaceOrder =
-    () => {
+    async () => {
       if (
         !cart ||
         cart.items.length === 0
@@ -55,7 +58,16 @@ export default function CartPage() {
         return;
       }
 
-      setPlaced(true);
+      setOrderLoading(true);
+      setError("");
+      const result = await createOrder();
+      setOrderLoading(false);
+
+      if (result.success) {
+        setPlaced(true);
+      } else {
+        setError(result.error || "Failed to place order");
+      }
     };
 
   const cartItems: CartItem[] =
@@ -336,8 +348,9 @@ export default function CartPage() {
                 onClick={
                   handlePlaceOrder
                 }
+                disabled={orderLoading}
               >
-                Proceed to Checkout
+                {orderLoading ? "Processing..." : "Proceed to Checkout"}
               </button>
 
               <button
@@ -712,7 +725,7 @@ body {
     box-shadow 0.2s;
 }
 
-.place-btn:hover {
+.place-btn:hover:not(:disabled) {
   background: #d4692e;
 
   transform: scale(1.02);
@@ -725,6 +738,12 @@ body {
       58,
       0.35
     );
+}
+
+.place-btn:disabled {
+  background: #9d7563;
+  cursor: not-allowed;
+  opacity: 0.7;
 }
 
 .clear-btn {

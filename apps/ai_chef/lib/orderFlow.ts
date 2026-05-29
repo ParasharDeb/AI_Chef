@@ -225,8 +225,50 @@ export const useMenu = () => {
     []
   );
 
+  const deleteItem = useCallback(async (id: string) => {
+    try {
+      const token = getToken();
+      const res = await fetch(`${API_BASE_URL}/items/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      const data = await res.json();
+      
+      if (!res.ok) {
+        return { error: data.error || 'Failed to delete item' };
+      }
+      
+      setItems(prev => prev.filter(item => item._id !== id));
+      return { success: true };
+    } catch (error) {
+      return { error: 'Network error' };
+    }
+  }, []);
+
+  // Set up WebSocket listeners for real-time menu updates
   useEffect(() => {
     fetchItems();
+    
+    const socket = io(API_BASE_URL);
+    
+    socket.on('menu_item_added', (newItem: any) => {
+      setItems(prev => [...prev, newItem]);
+    });
+    
+    socket.on('menu_item_updated', (updatedItem: any) => {
+      setItems(prev => prev.map(item => item._id === updatedItem._id ? updatedItem : item));
+    });
+    
+    socket.on('menu_item_deleted', (data: any) => {
+      setItems(prev => prev.filter(item => item._id !== data.id));
+    });
+    
+    return () => {
+      socket.disconnect();
+    };
   }, [fetchItems]);
 
   return {
@@ -236,6 +278,7 @@ export const useMenu = () => {
     fetchItems,
     addItem,
     updateItem,
+    deleteItem,
     addItemToCart,
   };
 };
@@ -343,6 +386,27 @@ export const useOrders = () => {
     }
   }, []);
 
+  // Set up WebSocket listeners for real-time order updates
+  useEffect(() => {
+    const socket = io(API_BASE_URL);
+    
+    socket.on('new_order', (newOrder: any) => {
+      setOrders(prev => [newOrder, ...prev]);
+    });
+    
+    socket.on('order_status_updated', (updatedOrder: any) => {
+      setOrders(prev => prev.map(order => 
+        order.orderId === updatedOrder.orderId 
+          ? { ...order, status: updatedOrder.status, updatedAt: updatedOrder.updatedAt }
+          : order
+      ));
+    });
+    
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
+
   return { orders, loading, error, fetchOrders, updateOrderStatus, markPreparing, markComplete };
 };
 
@@ -443,11 +507,35 @@ export const useCart = (sessionId: string) => {
     }
   }, [sessionId]);
 
+  const createOrder = useCallback(async () => {
+    try {
+      if (!cart || cart.items.length === 0) {
+        throw new Error('Cart is empty');
+      }
+      const res = await fetch(`${API_BASE_URL}/orders/create`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sessionId })
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to create order');
+      }
+      // Clear cart after successful order creation
+      setCart(null);
+      setTotal(0);
+      return { success: true, order: data.order };
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to create order';
+      return { error: message };
+    }
+  }, [sessionId, cart]);
+
   useEffect(() => {
     fetchCart();
   }, [fetchCart]);
 
-  return { cart, total, loading, addToCart, removeFromCart, clearCart, refetchCart: fetchCart };
+  return { cart, total, loading, addToCart, removeFromCart, clearCart, createOrder, refetchCart: fetchCart };
 };
 
 // ==================== PAYMENT UTILITIES ====================

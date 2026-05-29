@@ -125,7 +125,7 @@ app.post("/admin", async (req, res) => {
 app.post("/newitem", verifyToken, async (req, res) => {
     try {
         await connectDB();
-        const { name, price, image, description, category } = req.body;
+        const { name, price, image, description, category, available } = req.body;
 
         if (!name || !price || !image) {
             return res.status(400).json({ error: 'Name, price, and image are required' });
@@ -136,10 +136,15 @@ app.post("/newitem", verifyToken, async (req, res) => {
             price,
             image,
             category,
+            available: available !== false,
             description: description || ''
         });
 
         await newDish.save();
+        
+        // Broadcast to all clients for real-time updates
+        io.emit('menu_item_added', newDish);
+        
         res.status(201).json({ message: 'Item added successfully', dish: newDish });
     } catch (error) {
         res.status(500).json({ error: 'Server error' });
@@ -150,7 +155,7 @@ app.post("/newitem", verifyToken, async (req, res) => {
 app.put("/change-item", verifyToken, async (req, res) => {
     try {
         await connectDB();
-        const { id, name, price, image } = req.body;
+        const { id, name, price, image, description, category, available } = req.body;
 
         if (!id) {
             return res.status(400).json({ error: 'Item ID is required' });
@@ -160,6 +165,9 @@ app.put("/change-item", verifyToken, async (req, res) => {
         if (name) updateData.name = name;
         if (price) updateData.price = price;
         if (image) updateData.image = image;
+        if (description !== undefined) updateData.description = description;
+        if (category) updateData.category = category;
+        if (available !== undefined) updateData.available = available;
 
         const updatedDish = await dishModel.findByIdAndUpdate(id, updateData, { new: true });
         
@@ -167,7 +175,31 @@ app.put("/change-item", verifyToken, async (req, res) => {
             return res.status(404).json({ error: 'Item not found' });
         }
 
+        // Broadcast to all clients for real-time updates
+        io.emit('menu_item_updated', updatedDish);
+        
         res.json({ message: 'Item updated successfully', dish: updatedDish });
+    } catch (error) {
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
+// Delete item endpoint
+app.delete("/items/:id", verifyToken, async (req, res) => {
+    try {
+        await connectDB();
+        const { id } = req.params;
+
+        const deletedDish = await dishModel.findByIdAndDelete(id);
+        
+        if (!deletedDish) {
+            return res.status(404).json({ error: 'Item not found' });
+        }
+
+        // Broadcast to all clients for real-time updates
+        io.emit('menu_item_deleted', { id });
+        
+        res.json({ message: 'Item deleted successfully', dish: deletedDish });
     } catch (error) {
         res.status(500).json({ error: 'Server error' });
     }
@@ -379,20 +411,20 @@ app.post("/webhook/payment", express.raw({ type: 'application/json' }), async (r
             const paymentIntent = event.data.object as any;
             const sessionId = paymentIntent.metadata.sessionId;
 
-            // Get cart
-            const cart = await cartModel.findOne({ sessionId });
+            // Get cart with populated dish names
+            const cart = await cartModel.findOne({ sessionId }).populate('items.dishId');
             if (!cart) {
                 return res.status(404).json({ error: 'Cart not found' });
             }
 
-            // Create order
+            // Create order with proper dish names
             const orderId = `ORD-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
             const order = new orderModel({
                 orderId,
                 sessionId,
                 items: cart.items.map((item: any) => ({
-                    dishId: item.dishId,
-                    dishName: item.dishName || `Dish ${item.dishId}`,
+                    dishId: item.dishId._id,
+                    dishName: item.dishId.name || `Dish`,
                     quantity: item.quantity,
                     price: item.price
                 })),
@@ -407,12 +439,14 @@ app.post("/webhook/payment", express.raw({ type: 'application/json' }), async (r
             // Clear cart
             await cartModel.deleteOne({ sessionId });
 
-            // Send real-time update to kitchen
-            io.to(`kitchen-${sessionId}`).emit('new_order', {
+            // Broadcast new order to all admin clients
+            io.emit('new_order', {
+                _id: order._id,
                 orderId: order.orderId,
                 items: order.items,
                 totalAmount: order.totalAmount,
-                createdAt: order.createdAt
+                createdAt: order.createdAt,
+                status: order.status
             });
 
             res.json({ message: 'Payment verified and order created', order });
@@ -540,6 +574,72 @@ app.put("/orders/:orderId/complete", verifyToken, async (req, res) => {
         res.json({ message: 'Order completed', order });
     } catch (error) {
         res.status(500).json({ error: 'Server error' });
+    }
+});
+
+// Create order directly (for cart checkout without Stripe webhook)
+app.post("/orders/create", async (req, res) => {
+    try {
+        await connectDB();
+        const { sessionId } = req.body;
+
+        if (!sessionId) {
+            return res.status(400).json({ error: 'sessionId is required' });
+        }
+
+        // Get cart with populated dish names
+        const cart = await cartModel.findOne({ sessionId }).populate('items.dishId');
+        
+        if (!cart || cart.items.length === 0) {
+            return res.status(404).json({ error: 'Cart is empty or not found' });
+        }
+
+        // Create order with proper dish names
+        const orderId = `ORD-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+        const order = new orderModel({
+            orderId,
+            sessionId,
+            items: cart.items.map((item: any) => ({
+                dishId: item.dishId._id,
+                dishName: item.dishId.name || `Dish`,
+                quantity: item.quantity,
+                price: item.price
+            })),
+            totalAmount: cart.items.reduce((sum: number, item: any) => sum + (item.price * item.quantity), 0),
+            paymentId: `manual-${Date.now()}`,
+            paymentStatus: 'completed',
+            status: 'confirmed'
+        });
+
+        await order.save();
+
+        // Clear cart
+        await cartModel.deleteOne({ sessionId });
+
+        // Broadcast new order to all admin clients
+        io.emit('new_order', {
+            _id: order._id,
+            orderId: order.orderId,
+            items: order.items,
+            totalAmount: order.totalAmount,
+            createdAt: order.createdAt,
+            status: order.status
+        });
+
+        res.status(201).json({ 
+            message: 'Order created successfully', 
+            order: {
+                _id: order._id,
+                orderId: order.orderId,
+                items: order.items,
+                totalAmount: order.totalAmount,
+                createdAt: order.createdAt,
+                status: order.status
+            }
+        });
+    } catch (error) {
+        console.error('Order creation error:', error);
+        res.status(500).json({ error: 'Failed to create order' });
     }
 });
 

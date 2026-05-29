@@ -274,7 +274,7 @@ function EditModal({
 export default function AdminMenuManager() {
   const router = useRouter();
   const { isAuthenticated, loading: authLoading, logout } = useAuth();
-  const { items, loading: itemsLoading, addItem, updateItem } = useMenu();
+  const { items, loading: itemsLoading, addItem, updateItem, deleteItem } = useMenu();
   const [search, setSearch] = useState("");
   const [filterCat, setFilterCat] = useState("All");
   const [editing, setEditing] = useState<MenuItem | null>(null);
@@ -337,8 +337,18 @@ export default function AdminMenuManager() {
     }
   };
   const handleDelete = async (id: string) => {
-    showToast("Delete functionality coming soon", "error");
-    setDeleteId(null);
+    try {
+      const result = await deleteItem(id);
+      if (result.success) {
+        showToast("Item deleted successfully!");
+      } else {
+        showToast(result.error || "Failed to delete", "error");
+      }
+      setDeleteId(null);
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : "Unknown error";
+      showToast("Error: " + message, "error");
+    }
   };
   const filtered = (items as MenuItem[]).filter((it) => {
     const matchCat = filterCat === "All" || it.category === filterCat;
